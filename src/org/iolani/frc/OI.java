@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 import org.iolani.frc.util.PowerScaler;
 import org.iolani.frc.commands.*;
+import org.iolani.frc.commands.SeekGimbalToPosition.ShooterPosition;
 //import org.iolani.frc.commands.auto.AutoDriveStraight;
 //import org.iolani.frc.commands.auto.AutoGrabTrashCan;
 //import org.iolani.frc.commands.auto.AutoTurn;
@@ -18,7 +19,7 @@ import org.iolani.frc.commands.*;
 public class OI {
     private final Joystick _lStick = new Joystick(1);
     private final Joystick _rStick = new Joystick(2);
-    //private final Joystick _xStick = new Joystick(3);
+    private final Joystick _xStick = new Joystick(3);
     
     private final JoystickButton _intakeSuckButton = new JoystickButton(_rStick, 1);
     private final JoystickButton _intakeBlowButton = new JoystickButton(_rStick, 2);
@@ -27,12 +28,19 @@ public class OI {
     private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
     private final JoystickButton _shooterInButton   = new JoystickButton(_lStick, 7);
     
-    /*private final JoystickButton _elevatorUpButton       = new JoystickButton(_rStick, 2);
-    private final JoystickButton _elevatorDownButton     = new JoystickButton(_lStick, 2);
+    private final JoystickButton _shooterOutButton2 = new JoystickButton(_lStick, 9);
+    private final JoystickButton _shooterInButton2  = new JoystickButton(_lStick, 8);
     
-    private final JoystickButton _elevatorUpOneButton    = new JoystickButton(_rStick, 3);
-    private final JoystickButton _elevatorDownOneButton  = new JoystickButton(_lStick, 4);
+    private final JoystickButton _shooterOutButton3 = new JoystickButton(_lStick, 11);
+    private final JoystickButton _shooterInButton3  = new JoystickButton(_lStick, 10);
     
+    private final JoystickButton _gimbalPositionButton = new JoystickButton(_xStick, 2);
+    private final JoystickButton _gimbalPositionButton2 = new JoystickButton(_xStick, 3);
+    private final JoystickButton _gimbalPositionButton3 = new JoystickButton(_xStick, 5);
+    private final JoystickButton _gimbalPositionButton4 = new JoystickButton(_xStick, 6);
+    private final JoystickButton _gimbalPositionButton5 = new JoystickButton(_xStick, 4);
+    
+    /*
     private final JoystickButton _elevatorTestButton1    = new JoystickButton(_rStick, 6);
     private final JoystickButton _elevatorTestButton2    = new JoystickButton(_lStick, 3);
     
@@ -60,13 +68,25 @@ public class OI {
                 new PowerScaler.PowerPoint(0.90, 1.0)
             });
         
-        _intakeSuckButton.whileHeld(new SetIntakePower(1.0));
-        _intakeBlowButton.whileHeld(new SetIntakePower(-1.0));
+        //_intakeSuckButton.whileHeld(new SetIntakeVariablePower(1.0));
+        _intakeSuckButton.whileHeld(new SuckBall());
+        _intakeBlowButton.whileHeld(new SetIntakeVariablePower(-1.0));
         
         _shooterKickButton.whileHeld(new SetShooterKicker(true));
-        _shooterOutButton.whileHeld(new SetShooterWheelPower(1.0));
-        _shooterInButton.whileHeld(new SetShooterWheelPower(-1.0));
+        _shooterOutButton.whileHeld(new SetShooterWheelPower(0.2));
+        _shooterInButton.whileHeld(new SetShooterWheelPower(-0.2));
         
+        _shooterOutButton2.whileHeld(new SetShooterWheelPower(1.0));
+        _shooterInButton2.whileHeld(new SetShooterWheelPower(-1.0));
+        
+        _shooterOutButton3.whileHeld(new SetShooterWheelSpeed(5500));
+        _shooterInButton3.whileHeld(new SetShooterWheelSpeed(-5500));
+        
+        _gimbalPositionButton.whileHeld(new OperateGimbalUnsafe());
+        _gimbalPositionButton2.whileHeld(new OperateGimbalManual());
+        _gimbalPositionButton3.whenPressed(new SeekGimbalToPosition(ShooterPosition.Home));
+        _gimbalPositionButton4.whenPressed(new SeekGimbalToPosition(ShooterPosition.SlotLoad));
+        _gimbalPositionButton5.whileHeld(new OperateGimbalSlow());
         
         /*_elevatorUpOneButton.whenPressed(new JogElevatorToteHeight(true));
         _elevatorDownOneButton.whenPressed(new JogElevatorToteHeight(false));
@@ -96,6 +116,10 @@ public class OI {
     
     public Joystick getRightStick() {
         return _rStick;
+    }
+    
+    public Joystick getGunnerStick() {
+    	return _xStick;
     }
     
     public PowerScaler getPowerScaler() {

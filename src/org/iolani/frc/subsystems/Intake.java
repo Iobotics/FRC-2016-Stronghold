@@ -17,12 +17,11 @@ public class Intake extends Subsystem {
     public void init() {
     	_intake = new CANTalon(RobotMap.intakeTalon);
     	_intake.enableBrakeMode(true);
-    	_intake.setInverted(true);
     }
     
     // positive is in //
     public void setPower(double power) {
-    	_intake.set(power);
+    	_intake.set(-power);
     }
 
     public void initDefaultCommand() {

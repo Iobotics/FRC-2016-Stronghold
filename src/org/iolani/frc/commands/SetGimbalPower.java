@@ -3,23 +3,25 @@ package org.iolani.frc.commands;
 /**
  *
  */
-public class SetIntakePower extends CommandBase {
-	private final double _power;
+public class SetGimbalPower extends CommandBase {
+	private final double _azimuthPower, _elevationPower;
 	private final boolean _terminate;
-  
-    public SetIntakePower(double power) {
-    	this(power, false);
+    
+    public SetGimbalPower(double azimuthPower, double elevationPower) {
+    	this(azimuthPower, elevationPower, false);
     }
     
-    public SetIntakePower(double power, boolean terminate) {
-    	requires(intake);
-    	_power     = power;
-    	_terminate = terminate;
+    public SetGimbalPower(double azimuthPower, double elevationPower, boolean terminate) {
+    	requires(shooterGimbal);
+    	_azimuthPower   = azimuthPower;
+    	_elevationPower = elevationPower;
+    	_terminate      = terminate;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	intake.setPower(_power);
+    	shooterGimbal.setAzimuthPower(_azimuthPower);
+    	shooterGimbal.setElevationPower(_elevationPower);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -39,6 +41,7 @@ public class SetIntakePower extends CommandBase {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	intake.setPower(0.0);
+    	shooterGimbal.setAzimuthPower(0);
+    	shooterGimbal.setElevationPower(0);
     }
 }

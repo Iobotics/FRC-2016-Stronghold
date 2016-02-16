@@ -3,24 +3,23 @@ package org.iolani.frc.commands;
 /**
  *
  */
-public class SetShooterGimbalPower extends CommandBase {
-	private final double _azimuthPower, _elevationPower;
+public class SetShooterWheelSpeed extends CommandBase {
+	private final double  _rpm;
 	private final boolean _terminate;
     
-    public SetShooterGimbalPower(double azimuthPower, double elevationPower) {
-    	this(azimuthPower, elevationPower, false);
+    public SetShooterWheelSpeed(double rpm) {
+    	this(rpm, false);
     }
     
-    public SetShooterGimbalPower(double azimuthPower, double elevationPower, boolean terminate) {
-    	requires(shooterGimbal);
-    	_azimuthPower   = azimuthPower;
-    	_elevationPower = elevationPower;
-    	_terminate      = terminate;
+    public SetShooterWheelSpeed(double rpm, boolean terminate) {
+    	requires(shooterWheels);
+    	_rpm       = rpm;
+    	_terminate = terminate;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	shooterGimbal.setPower(_azimuthPower, _elevationPower);
+    	shooterWheels.setSpeed(_rpm);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -40,6 +39,6 @@ public class SetShooterGimbalPower extends CommandBase {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	shooterGimbal.setPower(0.0, 0.0);
+    	shooterWheels.setPower(0.0);
     }
 }

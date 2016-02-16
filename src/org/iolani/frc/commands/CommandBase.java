@@ -3,6 +3,7 @@ package org.iolani.frc.commands;
 import edu.wpi.first.wpilibj.command.Command;
 
 import org.iolani.frc.OI;
+import org.iolani.frc.subsystems.Camera;
 import org.iolani.frc.subsystems.DriveTrain;
 import org.iolani.frc.subsystems.Intake;
 import org.iolani.frc.subsystems.ShooterGimbal;
@@ -26,6 +27,7 @@ public abstract class CommandBase extends Command {
     public static final ShooterKicker shooterKicker = new ShooterKicker();
     public static final ShooterWheels shooterWheels = new ShooterWheels();
     public static final ShooterGimbal shooterGimbal = new ShooterGimbal();
+    public static final Camera        camera        = new Camera();
     
 //    public static final Elevator elevator = new Elevator();
 //    public static final NavigationSensor navsensor = new NavigationSensor();
@@ -46,6 +48,7 @@ public abstract class CommandBase extends Command {
         shooterKicker.init();
         shooterWheels.init();
         shooterGimbal.init();
+        camera.init();
     }
 
     public CommandBase(String name) {

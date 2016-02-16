@@ -65,6 +65,7 @@ public class Robot2016 extends IterativeRobot {
 	
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
+		SmartDashboard.putData(Scheduler.getInstance());
 	}
 
     public void autonomousInit() {
@@ -110,8 +111,8 @@ public class Robot2016 extends IterativeRobot {
         Scheduler.getInstance().run();
         
         SmartDashboard.putData(Scheduler.getInstance());
-//        CommandBase.elevator.debug();
-//        CommandBase.grabber.debug();
+        CommandBase.shooterWheels.debug();
+        CommandBase.shooterGimbal.debug();
         CommandBase.drivetrain.debug();
 //        CommandBase.navsensor.debug();
     }
