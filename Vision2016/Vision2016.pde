@@ -1,6 +1,6 @@
 // ***NOTE*** Requires installing (through Processing) three libraries: Minim, Video, and BlobDetection //
-
 import processing.video.*; //Used for cameras connected to this computer
+import processing.net.*;
 
 // Sound library //
 import ddf.minim.*;
@@ -13,7 +13,6 @@ import ddf.minim.ugens.*;
 import blobDetection.*;
 import edu.wpi.first.wpilibj.SimpleRobot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.camera.AxisCamera;
 import edu.wpi.first.wpilibj.image.*;
 
 // Target physical constants //
@@ -44,15 +43,27 @@ float targetRectangularityMax = 0.6;
 float imageCenterX = 0.5; //What should the program consider the "center" of the screen (as a proportion of its width and height)?
 float imageCenterY = 0.5;
 
-// Hardware constants //
-String CAMERA_IP = "0.0.0.0"; //TODO: Implement
+// Remote camera server //
+// Connects to a particular socket (normally used to commnicate to SmartDashboard) to read bytes sent from a camera server running onboard the robot, loading them into an image
+// Good discussion of pulling stuff from this port here: http://www.roborealm.com/forum/index.php?thread_id=5705 and http://www.roborealm.com/forum/index.php?thread_id=5472
+// Information on the camera server (including initialization values): https://github.com/jcreigh/FRCDriverStation/wiki/Camera-Server
+// Sample camera-viewing code (Python): https://gist.github.com/jcreigh/335f653431a9d98f2004
+Client cameraClient;
+String ip = "10.24.38.227";
+int camPort = 1180;
+boolean cameraConnected = false; //Has the camera connected yet?
+// Values sent to the camera server to begin receiving data //
+int fps_byte = 30; //30 FPS
+int compression_byte = -1; //Represents HW compression 
+int size_byte = 0; //Represents 640x480
+int[] init_bytes = {fps_byte, compression_byte, size_byte};
 
 // Connected to this computer //
 Capture connectedCamera;
 boolean cameraLoaded = false;
 int connectedCameraID; //Which in the list of connected cameras is the one we want?
-int cameraWidth = 800;
-int cameraHeight = 600;
+int cameraWidth = 640;
+int cameraHeight = 480;
 String cameraName = "name=Logitech HD Pro Webcam C920,size=800x600,fps=30";
 float cameraFocalLength = 0.1444882; //Inches
 float cameraSensorWidth = 0.188976; //Inches
@@ -64,9 +75,6 @@ float calibrationWidth = denormalize(0.091364205, cameraWidth);
 float calibrationHeight = denormalize(0.22871456, cameraHeight);
 float calibrationAspectRatio = calibrationWidth / calibrationHeight;
 float calibrationCameraHeight = 16; //Height the camera was off the ground during calibration; currently unused
-
-// Hardware //
-AxisCamera _camera; //Unused
 
 // Blob detector //
 BlobDetection blobDetector;
@@ -100,8 +108,8 @@ void setup() {
   audioLockedPitch.loop();
   audioLockedPitch.mute();
   
-  // Initialize ip camera //
-  //ipCam = new IPCapture(this, String urlString, String "root", String "password");
+  // Initialize camera client //
+  cameraClient = new Client(this, ip, camPort);
   
   // Initialize blob detector //
   blobDetector = new BlobDetection(cameraWidth, cameraHeight);
@@ -112,9 +120,32 @@ void setup() {
   //for (String cam : Capture.list()) {
     //println(cam);
   //}
+  frame = new PImage();
+  
+  // Send initialization values to the camera server //
 }
 
 void draw() { 
+  if (!cameraClient.active()) return; //Only read if we're connected to the camera server
+  if (!cameraConnected) {
+    cameraClient.write(fps_byte); //Currently not working; maybe these should be sent as a single array of ints, but Processing's Client implementation doesn't allow this
+    cameraClient.write(compression_byte);
+    cameraClient.write(size_byte);
+    cameraConnected = true;
+    return;
+  }
+  println(cameraClient.available());
+  if (true) return;
+  byte[] cameraImageBytes = cameraClient.readBytes();
+  if (cameraImageBytes == null) return;
+  frame.loadPixels();
+  for (int i = 7; i < cameraImageBytes.length; i++) { //Apparently bytes read from the socket can be fed directly into the image
+    frame.pixels[i] = cameraImageBytes[i];
+  }
+  frame.updatePixels();
+  
+  /*
+  // This is for using a connected camera //
   String[] connectedCameras;
   
   if (!cameraLoaded) {
@@ -135,14 +166,14 @@ void draw() {
     if (!foundCamera) return;
   }
   
-  // This is for using a connected camera //
   if (!connectedCamera.available()) return;
   connectedCamera.read();
   
   frame = connectedCamera;
+  */ 
   
   // Apply color filter //
-  PImage filteredFrame = filterImageHSBRange(connectedCamera, targetHueMin, targetHueMax, targetSatMin, targetSatMax, targetValMin, targetValMax);
+  PImage filteredFrame = filterImageHSBRange(frame, targetHueMin, targetHueMax, targetSatMin, targetSatMax, targetValMin, targetValMax);
   
   // Find blobs //
   filteredFrame.loadPixels();
