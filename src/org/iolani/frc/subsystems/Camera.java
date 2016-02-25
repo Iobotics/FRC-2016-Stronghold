@@ -1,12 +1,9 @@
 package org.iolani.frc.subsystems;
 
 import org.iolani.frc.RobotMap;
-import org.iolani.frc.commands.*;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.vision.USBCamera;
-import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CameraServer;
 
 /**
