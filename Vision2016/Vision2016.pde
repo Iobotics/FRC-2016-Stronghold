@@ -1,3 +1,5 @@
+import ipcapture.*;
+
 // ***NOTE*** Requires installing (through Processing) three libraries: Minim, Video, and BlobDetection //
 import processing.video.*; //Used for cameras connected to this computer
 import processing.net.*;
@@ -43,25 +45,16 @@ float targetRectangularityMax = 0.6;
 float imageCenterX = 0.5; //What should the program consider the "center" of the screen (as a proportion of its width and height)?
 float imageCenterY = 0.5;
 
-// Remote camera server //
-// Connects to a particular socket (normally used to commnicate to SmartDashboard) to read bytes sent from a camera server running onboard the robot, loading them into an image
-// Good discussion of pulling stuff from this port here: http://www.roborealm.com/forum/index.php?thread_id=5705 and http://www.roborealm.com/forum/index.php?thread_id=5472
-// Information on the camera server (including initialization values): https://github.com/jcreigh/FRCDriverStation/wiki/Camera-Server
-// Sample camera-viewing code (Python): https://gist.github.com/jcreigh/335f653431a9d98f2004
-Client cameraClient;
-String ip = "10.24.38.227";
-int camPort = 1180;
-boolean cameraConnected = false; //Has the camera connected yet?
-// Values sent to the camera server to begin receiving data //
-int fps_byte = 30; //30 FPS
-int compression_byte = -1; //Represents HW compression 
-int size_byte = 0; //Represents 640x480
-int[] init_bytes = {fps_byte, compression_byte, size_byte};
+// IPCapture //
+//Based on mjpeg-streamer script running on RoboRio to turn the output from a USB camera into an mjpg
+//mjpeg-streamer Readme: https://github.com/robotpy/roborio-packages/blob/2016/ipkg/mjpg-streamer/README.md
+//Important mjpeg-streamer settings (set through SSH config): 
+//-bk 0 (disable backlight compensation), -gain 0 (disable brightness correction), -cagc 0 (disable color correction), -ex 70 (high exposure), -sa 100 (very high saturation)
+//Other settings don't seem to change anything (they're dependent on the camera model)
+IPCapture camera;
+String mjpegURL = "http://10.24.38.227:5800/?action=stream";
 
-// Connected to this computer //
-Capture connectedCamera;
-boolean cameraLoaded = false;
-int connectedCameraID; //Which in the list of connected cameras is the one we want?
+// Camera parameters //
 int cameraWidth = 640;
 int cameraHeight = 480;
 String cameraName = "name=Logitech HD Pro Webcam C920,size=800x600,fps=30";
@@ -98,7 +91,8 @@ void setup() {
   noFill();
   strokeWeight(1);
   stroke(0.0, 100.0, 100.0); //Red stroke
-  size(1000, 1000);
+  size(640, 480);
+  frameRate(10);
   
   // Initialize sound //
   minim = new Minim(this);
@@ -107,70 +101,26 @@ void setup() {
   audioLockedPitch.setLoopPoints(100, 4000); //Produces a cleaner loop
   audioLockedPitch.loop();
   audioLockedPitch.mute();
-  
-  // Initialize camera client //
-  cameraClient = new Client(this, ip, camPort);
+ 
+  // Initialize IPCapture connection //
+  camera = new IPCapture(this, mjpegURL, "", ""); //No username / password
+  camera.start();
   
   // Initialize blob detector //
   blobDetector = new BlobDetection(cameraWidth, cameraHeight);
   blobDetector.setPosDiscrimination(true); //Detector will search for bright areas
   blobs = new ArrayList<Blob>();
   
-  // Print camera list //
-  //for (String cam : Capture.list()) {
-    //println(cam);
-  //}
   frame = new PImage();
-  
-  // Send initialization values to the camera server //
 }
 
-void draw() { 
-  if (!cameraClient.active()) return; //Only read if we're connected to the camera server
-  if (!cameraConnected) {
-    cameraClient.write(fps_byte); //Currently not working; maybe these should be sent as a single array of ints, but Processing's Client implementation doesn't allow this
-    cameraClient.write(compression_byte);
-    cameraClient.write(size_byte);
-    cameraConnected = true;
-    return;
-  }
-  println(cameraClient.available());
-  if (true) return;
-  byte[] cameraImageBytes = cameraClient.readBytes();
-  if (cameraImageBytes == null) return;
-  frame.loadPixels();
-  for (int i = 7; i < cameraImageBytes.length; i++) { //Apparently bytes read from the socket can be fed directly into the image
-    frame.pixels[i] = cameraImageBytes[i];
-  }
-  frame.updatePixels();
-  
-  /*
-  // This is for using a connected camera //
-  String[] connectedCameras;
-  
-  if (!cameraLoaded) {
-    connectedCameras = Capture.list();
-    boolean foundCamera = false;
-    for (int i = 0; i < connectedCameras.length; i++) {
-      if (connectedCameras[i].equals(cameraName)) {
-        connectedCameraID = i;
-        connectedCamera = new Capture(this, connectedCameras[connectedCameraID]);
-        connectedCamera.start();
-        cameraLoaded = true;
-        println("Loaded camera: " + connectedCameras[connectedCameraID]);
-        foundCamera = true;
-        break;
-      }
-    }
-    
-    if (!foundCamera) return;
+void draw() {
+  // Get image from streamed mjpg //
+  if (camera.isAvailable()) {
+    camera.read();
   }
   
-  if (!connectedCamera.available()) return;
-  connectedCamera.read();
-  
-  frame = connectedCamera;
-  */ 
+  frame = camera;
   
   // Apply color filter //
   PImage filteredFrame = filterImageHSBRange(frame, targetHueMin, targetHueMax, targetSatMin, targetSatMax, targetValMin, targetValMax);
@@ -180,10 +130,6 @@ void draw() {
   blobDetector.computeTriangles();
   blobDetector.computeBlobs(filteredFrame.pixels);
   filteredFrame.updatePixels();
-  
-  // Display image //
-  image(connectedCamera, 0, 0);
-  //image(connectedCamera, 0, 0);
   
   // Build ArrayList for easy blob access //
   blobs = new ArrayList<Blob>(); //Clear old list
@@ -226,6 +172,9 @@ void draw() {
   float leastError = -1; //Least error seen so far
   float error;
   
+  // Display image //
+  image(frame, 0, 0);
+  
   // Show target reports and play sounds //
   textSize(23);
   fill(255);
@@ -236,12 +185,15 @@ void draw() {
     target = filteredBlobs.get(i);
     
     // Text //
+    float rounder = 1000.0; //Quick and dirty rounding to this number's digits
     noStroke();
     text("Target " + (i + 1) + " :", 20, displayBuffer);
     displayBuffer += displayBufferIncrement;
-    text("X error: " + getTargetXError(target), 60, displayBuffer);
+    text("X error: " + round(getTargetXError(target) * rounder) / rounder, 60, displayBuffer);
     displayBuffer += displayBufferIncrement;
-    text("Y error: " + getTargetYError(target), 60, displayBuffer);
+    text("Y error: " + round(getTargetYError(target) * rounder) / rounder, 60, displayBuffer);
+    displayBuffer += displayBufferIncrement;
+    text("Estimated distance: " + round(getTargetDistance(target) * rounder) / rounder, 60, displayBuffer);
     displayBuffer += displayBufferIncrement;
     
     // Target crosshair //
