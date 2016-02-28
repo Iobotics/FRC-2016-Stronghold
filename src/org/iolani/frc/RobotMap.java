@@ -22,6 +22,7 @@ public class RobotMap {
     
     // intake //
     public static final int intakeTalon = 9;
+    public static final int intakeValve = 7;
     
     // shooter //
     public static final int shooterAzimuth    = 7;
