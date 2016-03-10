@@ -1,3 +1,5 @@
+import gab.opencv.*;
+
 import ipcapture.*;
 
 // ***NOTE*** Requires installing (through Processing) three libraries: Minim, Video, and BlobDetection //
@@ -26,8 +28,8 @@ float targetHeight = 14.0;
 float hueMax = 360.0;
 float satMax = 100.0;
 float valMax = 100.0;
-float targetHueMin = 50; //130
-float targetHueMax = 220; //200
+float targetHueMin = 130; //130
+float targetHueMax = 200; //200
 float targetSatMin = 20.0; //20
 float targetSatMax = 100.0;
 float targetValMin = 20.0;
@@ -49,7 +51,7 @@ float imageCenterY = 0.5;
 //Based on mjpeg-streamer script running on RoboRio to turn the output from a USB camera into an mjpg
 //mjpeg-streamer Readme: https://github.com/robotpy/roborio-packages/blob/2016/ipkg/mjpg-streamer/README.md
 //Important mjpeg-streamer settings (set through SSH config): 
-//-bk 0 (disable backlight compensation), -gain 0 (disable brightness correction), -cagc 0 (disable color correction), -ex 70 (high exposure), -sa 100 (very high saturation)
+//-bk 0 (disable backlight compensation), -gain 0 (disable brightness correction), -cagc 0 (disable color correction), -ex 20 (low exposure), -sa 200 (very high saturation), -co 100 (high contrast)
 //Other settings don't seem to change anything (they're dependent on the camera model)
 IPCapture camera;
 String mjpegURL = "http://10.24.38.227:5800/?action=stream";
@@ -63,7 +65,7 @@ float cameraSensorWidth = 0.188976; //Inches
 float cameraSensorHeight = 0.141732;
 
 // Distance calibration constants //
-float calibrationDistance = 96; //Inches
+float calibrationDistance = 122; //Inches
 float calibrationWidth = denormalize(0.091364205, cameraWidth);
 float calibrationHeight = denormalize(0.22871456, cameraHeight);
 float calibrationAspectRatio = calibrationWidth / calibrationHeight;
@@ -82,6 +84,9 @@ AudioPlayer audioLockedPitch;
 int targetingBeepDelayFrames = 10; //Frames to wait for targeting beep, on average
 float targetingBeepRemainingFrames = targetingBeepDelayFrames;
 float lockedErrorMax = 0.2; //Maximum error to play the "target locked" sound... TODO: Make this depend on actual likely successful shot region
+
+// OpenCV //
+OpenCV opencv;
 
 void setup() {
   // Set up Processing constants //  
@@ -111,7 +116,10 @@ void setup() {
   blobDetector.setPosDiscrimination(true); //Detector will search for bright areas
   blobs = new ArrayList<Blob>();
   
+  // Initialize OpenCV //
   frame = new PImage();
+  opencv = new OpenCV(this, camera);
+  //Contour.setPolygonApproximationFactor(2); //TODO: Parameterize
 }
 
 void draw() {
@@ -124,6 +132,7 @@ void draw() {
   
   // Apply color filter //
   PImage filteredFrame = filterImageHSBRange(frame, targetHueMin, targetHueMax, targetSatMin, targetSatMax, targetValMin, targetValMax);
+  //image(filteredFrame, 0, 0);
   
   // Find blobs //
   filteredFrame.loadPixels();
@@ -175,6 +184,63 @@ void draw() {
   // Display image //
   image(frame, 0, 0);
   
+  // Find bar height with OpenCV //
+  // Find largest estimated polygon
+  opencv.loadImage(filteredFrame);
+  //image(opencv.getOutput(), 0, 0);
+  Contour polygonApproximation;
+  Contour largestPolygon = null; //Largest polygon detected; used to estimate distance
+  for (Contour contour : opencv.findContours()) {
+    contour.setPolygonApproximationFactor(3); //TODO: Parameterize, tune... this determines how "strict" the polygon approximation process is
+    polygonApproximation = contour.getPolygonApproximation();
+    if (largestPolygon == null || polygonApproximation.area() > largestPolygon.area()) {
+      largestPolygon = polygonApproximation;
+    }
+    
+    polygonApproximation.draw();
+  }
+  
+  float barLength = -1.0; //Used for distance calculation; if height = -1, then bar height calc failed
+  
+  if (largestPolygon != null) {
+    ArrayList<PVector> polygonPoints = largestPolygon.getPoints();
+    ArrayList<PVector> upperLeftCandidates = new ArrayList<PVector>();
+    ArrayList<PVector> lowerLeftCandidates = new ArrayList<PVector>();
+    
+    // Find upper left and bottom left corners //
+    PVector upperLeft = null;
+    PVector bottomLeft = null;
+    
+    for (PVector point : polygonPoints) {
+      if (point.y < largestPolygon.getBoundingBox().getLocation().y + (largestPolygon.getBoundingBox().getHeight() / 3)) { //This point is in the upper third of the rectangle
+        upperLeftCandidates.add(point);
+      } else if (point.y > largestPolygon.getBoundingBox().getLocation().y - (largestPolygon.getBoundingBox().getHeight() / 3)) { //This point is in the lower third of the rectangle
+        lowerLeftCandidates.add(point);
+      }
+    }
+    
+    for (PVector point : upperLeftCandidates) { //Locate leftmost candidate
+      if (upperLeft == null || upperLeft.x > point.x) upperLeft = point;
+    }
+    
+    for (PVector point : lowerLeftCandidates) { //Locate leftmost candidate
+      if (bottomLeft == null || bottomLeft.x > point.x) bottomLeft = point;
+    }
+    
+    if (upperLeft != null && bottomLeft != null) {
+      ellipseMode(CENTER);
+      ellipse(upperLeft.x, upperLeft.y, 4, 4);
+      ellipse(bottomLeft.x, bottomLeft.y, 4, 4);
+      
+      // Find bar height //
+      barLength = dist(upperLeft.x, upperLeft.y, bottomLeft.x, bottomLeft.y);
+    }
+  }
+  
+  float estimatedDistance = getDistance(barLength);
+  
+  println(estimatedDistance);
+  
   // Show target reports and play sounds //
   textSize(23);
   fill(255);
@@ -193,7 +259,7 @@ void draw() {
     displayBuffer += displayBufferIncrement;
     text("Y error: " + round(getTargetYError(target) * rounder) / rounder, 60, displayBuffer);
     displayBuffer += displayBufferIncrement;
-    text("Estimated distance: " + round(getTargetDistance(target) * rounder) / rounder, 60, displayBuffer);
+    text("Estimated distance: " + round(estimatedDistance * rounder) / rounder, 60, displayBuffer);
     displayBuffer += displayBufferIncrement;
     
     // Target crosshair //
@@ -310,6 +376,11 @@ float getTargetDistance(Blob target) { //Assumes blob is a potential target; ret
   */
   float observedHeightPixels = denormalize(target.h, cameraHeight);
   return (cameraFocalLength * targetHeight * cameraHeight) / (observedHeightPixels  * cameraSensorHeight);
+}
+
+float getDistance(float barHeight) { //Returns inches
+  // TODO: Make this more readable, parameterize //
+  return 12 * (43.1 - (0.66 * barHeight));
 }
 
 float getTargetXError(Blob target) { //Returns an "aim error" value the control loop should try to zero; normalized based on height so that distance doesn't change the results that much
