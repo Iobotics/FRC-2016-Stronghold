@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import org.iolani.frc.util.PowerScaler;
 import org.iolani.frc.commands.*;
 import org.iolani.frc.commands.SeekGimbalToPosition.ShooterPosition;
+import org.iolani.frc.subsystems.Intake.RampPosition;
 //import org.iolani.frc.commands.auto.AutoDriveStraight;
 //import org.iolani.frc.commands.auto.AutoGrabTrashCan;
 //import org.iolani.frc.commands.auto.AutoTurn;
@@ -70,7 +71,7 @@ public class OI {
         
         //_intakeSuckButton.whileHeld(new SetIntakeVariablePower(1.0));
         _intakeSuckButton.whileHeld(new SuckBall());
-        _intakeBlowButton.whileHeld(new SetIntakeVariablePower(-1.0));
+        _intakeBlowButton.whileHeld(new SetIntakeVariablePower(-1.0, RampPosition.Deployed));
         
         _shooterKickButton.whileHeld(new SetShooterKicker(true));
         _shooterOutButton.whileHeld(new SetShooterWheelPower(0.2));
