@@ -114,6 +114,7 @@ public class Robot2016 extends IterativeRobot {
         CommandBase.shooterWheels.debug();
         CommandBase.shooterGimbal.debug();
         CommandBase.drivetrain.debug();
+        SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
 //        CommandBase.navsensor.debug();
     }
     

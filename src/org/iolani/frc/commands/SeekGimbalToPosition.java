@@ -12,7 +12,9 @@ public class SeekGimbalToPosition extends CommandGroup {
     
 	public enum GimbalPosition {
 		Home,
-		SlotLoad
+		SlotLoad,
+		Clearance,
+		GunnerNeutral
 	}
     
     public SeekGimbalToPosition(GimbalPosition pos) {
@@ -25,6 +27,14 @@ public class SeekGimbalToPosition extends CommandGroup {
     		case SlotLoad:
     			this.addSequential(new SeekGimbalAzimuth(0.0));
     			this.addSequential(new SeekGimbalElevation(97.0));
+    			break;
+    		case Clearance:
+    			this.addSequential(new SeekGimbalAzimuth(0.0));
+    			this.addSequential(new SeekGimbalElevation(5.0));
+    			break;
+    		case GunnerNeutral:
+    			this.addSequential(new SeekGimbalAzimuth(0.0));
+    			this.addSequential(new SeekGimbalElevation(45.0));
     			break;
     		default:
     			throw new IllegalArgumentException("Unknown position: " + pos);

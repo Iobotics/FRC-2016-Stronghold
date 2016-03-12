@@ -1,6 +1,5 @@
 package org.iolani.frc.commands;
 
-import org.iolani.frc.subsystems.Intake.RampPosition;
 import org.iolani.frc.commands.SeekGimbalToPosition;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
 
