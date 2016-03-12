@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.iolani.frc.commands;
+package org.iolani.frc.commands.debug;
 
+import org.iolani.frc.commands.CommandBase;
 import org.iolani.frc.util.PowerScaler;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;

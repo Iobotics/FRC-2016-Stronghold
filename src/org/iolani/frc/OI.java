@@ -2,12 +2,14 @@
 package org.iolani.frc;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.Button;
 //import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 import org.iolani.frc.util.PowerScaler;
 import org.iolani.frc.commands.*;
-import org.iolani.frc.commands.SeekGimbalToPosition.ShooterPosition;
+import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
+import org.iolani.frc.commands.debug.OperateGimbalUnsafe;
 import org.iolani.frc.subsystems.Intake.RampPosition;
 //import org.iolani.frc.commands.auto.AutoDriveStraight;
 //import org.iolani.frc.commands.auto.AutoGrabTrashCan;
@@ -22,10 +24,16 @@ public class OI {
     private final Joystick _rStick = new Joystick(2);
     private final Joystick _xStick = new Joystick(3);
     
-    private final JoystickButton _intakeSuckButton = new JoystickButton(_rStick, 1);
-    private final JoystickButton _intakeBlowButton = new JoystickButton(_rStick, 2);
+    private final JoystickButton _intakeButton      = new JoystickButton(_rStick, 1);
+    private final JoystickButton _outakeButton      = new JoystickButton(_lStick, 1);
     
-    private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
+    private final JoystickButton _ballOperateButton = new JoystickButton(_lStick, 2);
+    
+    private final JoystickButton _homePositionButton  = new JoystickButton(_rStick, 3);
+    private final JoystickButton _loadPositionButton  = new JoystickButton(_lStick, 3);
+    private final JoystickButton _clearPositionButton = new JoystickButton(_lStick, 5);
+    
+    /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
     private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
     private final JoystickButton _shooterInButton   = new JoystickButton(_lStick, 7);
     
@@ -40,22 +48,7 @@ public class OI {
     private final JoystickButton _gimbalPositionButton3 = new JoystickButton(_xStick, 5);
     private final JoystickButton _gimbalPositionButton4 = new JoystickButton(_xStick, 6);
     private final JoystickButton _gimbalPositionButton5 = new JoystickButton(_xStick, 4);
-    
-    /*
-    private final JoystickButton _elevatorTestButton1    = new JoystickButton(_rStick, 6);
-    private final JoystickButton _elevatorTestButton2    = new JoystickButton(_lStick, 3);
-    
-    private final JoystickButton _elevatorHomeButton     = new JoystickButton(_lStick, 6);
-    
-    private final JoystickButton _grabberCloseButton 	 = new JoystickButton(_lStick, 5);
-    private final JoystickButton _grabberOpenButton		 = new JoystickButton(_rStick, 4);
-    
-    private final JoystickButton _navCalibrateButton     = new JoystickButton(_lStick, 7);
-    
-    private final JoystickButton _autoTestButton1        = new JoystickButton(_lStick, 8);
-    private final JoystickButton _autoTestButton2        = new JoystickButton(_lStick, 9);
-    private final JoystickButton _autoTestButton3        = new JoystickButton(_lStick, 10);
-    private final JoystickButton _autoTestButton4        = new JoystickButton(_lStick, 11);*/
+    */
     
     private final PowerScaler _scaler;
     
@@ -69,8 +62,14 @@ public class OI {
                 new PowerScaler.PowerPoint(0.90, 1.0)
             });
         
+        _intakeButton.whileHeld(new IntakeBall());
+        _outakeButton.whileHeld(new OutakeBall());
+        
+        _homePositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Home));
+        _loadPositionButton.whenPressed(new LoadBall());
+        
         //_intakeSuckButton.whileHeld(new SetIntakeVariablePower(1.0));
-        _intakeSuckButton.whileHeld(new SuckBall());
+        /*_intakeSuckButton.whileHeld(new IntakeBall());
         _intakeBlowButton.whileHeld(new SetIntakeVariablePower(-1.0, RampPosition.Deployed));
         
         _shooterKickButton.whileHeld(new SetShooterKicker(true));
@@ -87,7 +86,7 @@ public class OI {
         _gimbalPositionButton2.whileHeld(new OperateGimbalManual());
         _gimbalPositionButton3.whenPressed(new SeekGimbalToPosition(ShooterPosition.Home));
         _gimbalPositionButton4.whenPressed(new SeekGimbalToPosition(ShooterPosition.SlotLoad));
-        _gimbalPositionButton5.whileHeld(new OperateGimbalSlow());
+        _gimbalPositionButton5.whileHeld(new OperateGimbalSlow());*/
         
         /*_elevatorUpOneButton.whenPressed(new JogElevatorToteHeight(true));
         _elevatorDownOneButton.whenPressed(new JogElevatorToteHeight(false));
@@ -117,6 +116,10 @@ public class OI {
     
     public Joystick getRightStick() {
         return _rStick;
+    }
+    
+    public Button getBallOperateButton() {
+    	return _ballOperateButton;
     }
     
     public Joystick getGunnerStick() {

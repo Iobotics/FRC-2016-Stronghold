@@ -3,16 +3,19 @@ package org.iolani.frc.commands;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
- *
+ *  Seek the gimbal to a pre-defined position, terminating when complete.
+ *  
+ *  This command seeks azimuth first to prevent any collisions when elevation
+ *  is reduced.
  */
 public class SeekGimbalToPosition extends CommandGroup {
     
-	public enum ShooterPosition {
+	public enum GimbalPosition {
 		Home,
 		SlotLoad
 	}
     
-    public SeekGimbalToPosition(ShooterPosition pos) {
+    public SeekGimbalToPosition(GimbalPosition pos) {
     	
     	switch(pos) {
     		case Home:

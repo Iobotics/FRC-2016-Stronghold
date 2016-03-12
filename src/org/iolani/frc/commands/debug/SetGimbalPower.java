@@ -1,4 +1,6 @@
-package org.iolani.frc.commands;
+package org.iolani.frc.commands.debug;
+
+import org.iolani.frc.commands.CommandBase;
 
 /**
  *

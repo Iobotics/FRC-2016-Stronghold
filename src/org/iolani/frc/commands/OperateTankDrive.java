@@ -4,8 +4,6 @@
  */
 package org.iolani.frc.commands;
 
-import org.iolani.frc.util.PowerScaler;
-
 /**
  *
  * @author iobotics
