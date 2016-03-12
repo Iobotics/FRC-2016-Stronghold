@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.iolani.frc.RobotMap;
-import org.iolani.frc.commands.OperateArcadeTankDrive;
+import org.iolani.frc.commands.OperateArcadeDrive;
+import org.iolani.frc.commands.OperateTankDrive;
 import org.iolani.frc.util.Utility;
 
 /**
@@ -78,23 +79,65 @@ public class DriveTrain extends Subsystem {
         System.out.println("drive init end");
     }
 
+    public void initDefaultCommand() {
+        // Set the default command for a subsystem here.
+        this.setDefaultCommand(new OperateTankDrive());
+    }
 
+    /**
+     * Set Tank drive powers (independent left / right side).
+     * 
+     * @param left  - positive is forward
+     * @param right - positive is forward
+     */
     public void setTank(double left, double right) {
+    	this.setTank(left, right, false);
+    }
+ 
+    /**
+     * Set Tank drive powers (independent left / right side) with optional scaling.
+     * 
+     * @param left  - positive is forward
+     * @param right - positive is forward
+     * @param squaredInputs - square the input (-1.0 < i < 1.0) for parabolic sensitivity
+     */
+    public void setTank(double left, double right, boolean squaredInputs) {
+    	
+    	if (squaredInputs) {
+            // square the inputs (while preserving the sign) to increase fine control while permitting full power
+            if (left >= 0.0) {
+                left = (left * left);
+            } else {
+                left = -(left * left);
+            }
+            if (right >= 0.0) {
+                right = (right * right);
+            } else {
+                right = -(right * right);
+            }
+        }
+    	
     	_left.set(left);
     	_right.set(right);
     }
     
-    public void initDefaultCommand() {
-        // Set the default command for a subsystem here.
-        this.setDefaultCommand(new OperateArcadeTankDrive());
+    /**
+     * Arcade drive implements throttle and rudder style steering, either with one stick or two.
+     * 
+     * @param moveValue   - positive is forward
+     * @param rotateValue - positive is counterclockwise
+     */
+    public void setArcade(double moveValue, double rotateValue) {
+        this.setArcade(moveValue, rotateValue, false);
     }
     
     /**
-     * Arcade drive implements single stick driving.
-     * This function lets you directly provide joystick values from any source.
-     * @param moveValue The value to use for forwards/backwards
-     * @param rotateValue The value to use for the rotate right/left
-     * @param squaredInputs If set, decreases the sensitivity at low speeds
+     * Arcade drive implements throttle and rudder style steering, either with one stick or two
+     * with optional input scaling.
+     * 
+     * @param moveValue     - positive is forward
+     * @param rotateValue   - positive is counterclockwise
+     * @param squaredInputs - square the input (-1.0 < i < 1.0) for parabolic sensitivity
      */
     public void setArcade(double moveValue, double rotateValue, boolean squaredInputs) {
         double leftMotorSpeed;
@@ -153,16 +196,6 @@ public class DriveTrain extends Subsystem {
     	SmartDashboard.putNumber("drive-right-ticks", _rEncoder.get());
     	SmartDashboard.putNumber("drive-left-distance", _lEncoder.getDistance());
     	SmartDashboard.putNumber("drive-right-distance", _rEncoder.getDistance());
-    }
-
-    /**
-     * Arcade drive implements single stick driving.
-     * This function lets you directly provide joystick values from any source.
-     * @param moveValue The value to use for fowards/backwards
-     * @param rotateValue The value to use for the rotate right/left
-     */
-    public void setArcade(double moveValue, double rotateValue) {
-        this.setArcade(moveValue, rotateValue, false);
     }
     
 }
