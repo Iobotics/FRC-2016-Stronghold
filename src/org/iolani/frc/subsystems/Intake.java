@@ -30,7 +30,7 @@ public class Intake extends Subsystem {
     
     // positive is in //
     public void setPower(double power) {
-    	_intake.set(-power);
+    	_intake.set(power);
     }
 
     public void setRampPosition(RampPosition pos) {
