@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.image.*;
 
 // Target physical constants //
 float targetWidth = 20.0; //Inches
-float targetHeight = 14.0;
+float targetHeight = 12.0;
 
 // Image constants //
 //TODO: Tune
@@ -38,11 +38,11 @@ float targetBoundingBoxAreaMin = 0.0005;
 float targetAreaMin = 0.003;
 //Aspect ratio: Width / height... ideal = 1.6
 float targetAspectRatioMin = 0.25;  
-float targetAspectRatioMax = 1.5;
+float targetAspectRatioMax = 3.0;
 float targetAspectRatioIdeal = 1.6;
 //Rectangularity: Area / bounding box area... ideal = 0.3
-float targetRectangularityMin = 0.1;
-float targetRectangularityMax = 0.6;
+float targetRectangularityMin = 0.0;
+float targetRectangularityMax = 3.0;
 
 float imageCenterX = 0.5; //What should the program consider the "center" of the screen (as a proportion of its width and height)?
 float imageCenterY = 0.5;
@@ -134,6 +134,8 @@ void draw() {
   PImage filteredFrame = filterImageHSBRange(frame, targetHueMin, targetHueMax, targetSatMin, targetSatMax, targetValMin, targetValMax);
   //image(filteredFrame, 0, 0);
   
+  //if (true) return;
+  
   // Find blobs //
   filteredFrame.loadPixels();
   blobDetector.computeTriangles();
@@ -212,9 +214,9 @@ void draw() {
     PVector bottomLeft = null;
     
     for (PVector point : polygonPoints) {
-      if (point.y < largestPolygon.getBoundingBox().getLocation().y + (largestPolygon.getBoundingBox().getHeight() / 3)) { //This point is in the upper third of the rectangle
+      if (point.y < largestPolygon.getBoundingBox().getLocation().y + (largestPolygon.getBoundingBox().getHeight() / 2)) { //This point is in the upper half of the rectangle
         upperLeftCandidates.add(point);
-      } else if (point.y > largestPolygon.getBoundingBox().getLocation().y - (largestPolygon.getBoundingBox().getHeight() / 3)) { //This point is in the lower third of the rectangle
+      } else if (point.y > largestPolygon.getBoundingBox().getLocation().y - (largestPolygon.getBoundingBox().getHeight() / 2)) { //This point is in the lower half of the rectangle
         lowerLeftCandidates.add(point);
       }
     }
@@ -239,7 +241,8 @@ void draw() {
   
   float estimatedDistance = getDistance(barLength);
   
-  println(estimatedDistance);
+  println("Bar length: " + barLength);
+  println("Estimated distance: " + estimatedDistance);
   
   // Show target reports and play sounds //
   textSize(23);
@@ -260,6 +263,8 @@ void draw() {
     text("Y error: " + round(getTargetYError(target) * rounder) / rounder, 60, displayBuffer);
     displayBuffer += displayBufferIncrement;
     text("Estimated distance: " + round(estimatedDistance * rounder) / rounder, 60, displayBuffer);
+    displayBuffer += displayBufferIncrement;
+    text("Y Height: " + round((cameraHeight - (target.y * cameraHeight)) * rounder) / rounder, 60, displayBuffer);
     displayBuffer += displayBufferIncrement;
     
     // Target crosshair //
@@ -380,7 +385,8 @@ float getTargetDistance(Blob target) { //Assumes blob is a potential target; ret
 
 float getDistance(float barHeight) { //Returns inches
   // TODO: Make this more readable, parameterize //
-  return 12 * (43.1 - (0.66 * barHeight));
+  //return 12 * (55.7 - (1.28 * barHeight));
+  return (-9.271 * barHeight) + 517.683;
 }
 
 float getTargetXError(Blob target) { //Returns an "aim error" value the control loop should try to zero; normalized based on height so that distance doesn't change the results that much
