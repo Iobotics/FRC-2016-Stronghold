@@ -41,7 +41,7 @@ public class OperateGimbalUnsafe extends CommandBase {
         
         System.out.println("gimbal: " + azimuth + ", " + elevation);
         shooterGimbal.setAzimuthPower(azimuth);
-        shooterGimbal.setElevationPower(-elevation);
+        shooterGimbal.setElevationPower(elevation);
         
         if(oi.getGunnerStick().getRawButton(1)) {
         	shooterGimbal.resetEncoders();

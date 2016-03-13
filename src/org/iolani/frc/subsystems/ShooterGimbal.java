@@ -20,19 +20,27 @@ public class ShooterGimbal extends Subsystem {
 	
 	private double _azimuthSetpoint;
 	private double _elevationSetpoint;
-    
+	
+	public enum ElevationEnvelope {
+		Full,
+		Shot
+	}
+	
 	// physical constants //
 	private static final double AZIMUTH_PINION_TEETH    = 12;
 	private static final double AZIMUTH_GEAR_TEETH      = 120;
 	private static final double AZIMUTH_DEGREES_PER_REV = (AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH) * 360;
-	private static final double AZIMUTH_DEGREES_MIN     = -40;
-	private static final double AZIMUTH_DEGREES_MAX     = 40;
+	private static final double AZIMUTH_DEGREES_MIN     = -36;
+	private static final double AZIMUTH_DEGREES_MAX     = 36;
 	
 	private static final double ELEVATION_PINION_TEETH    = 14;
 	private static final double ELEVATION_GEAR_TEETH      = 160;
 	private static final double ELEVATION_DEGREES_PER_REV = (ELEVATION_PINION_TEETH / ELEVATION_GEAR_TEETH) * 360;
 	private static final double ELEVATION_DEGREES_MIN     = 0;
 	private static final double ELEVATION_DEGREES_MAX     = 97;
+	
+	private static final double ELEVATION_SHOT_DEGREES_MIN = 30;
+	private static final double ELEVATION_SHOT_DEGREES_MAX = 60;
 	
     public void init() {
     	_azimuth = new CANTalon(RobotMap.shooterAzimuth);
@@ -66,9 +74,8 @@ public class ShooterGimbal extends Subsystem {
     	_elevation.enableBrakeMode(true);
     	_elevation.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
     	
-    	_elevation.setForwardSoftLimit(-ELEVATION_DEGREES_MIN / ELEVATION_DEGREES_PER_REV);
+    	this.setElevationEnvelope(ElevationEnvelope.Full);
     	_elevation.enableForwardSoftLimit(true);
-    	_elevation.setReverseSoftLimit(-ELEVATION_DEGREES_MAX / ELEVATION_DEGREES_PER_REV);
     	_elevation.enableReverseSoftLimit(true);
     	
     	_elevation.configNominalOutputVoltage(+0.0f, -0.0f);
@@ -140,6 +147,19 @@ public class ShooterGimbal extends Subsystem {
 
     public double getElevationErrorDegrees() {
     	return this.getElevationDegrees() - this.getElevationSetpointDegrees();
+    }
+    
+    public void setElevationEnvelope(ElevationEnvelope env) {
+    	switch(env) {
+    		case Full:
+    	    	_elevation.setForwardSoftLimit(-ELEVATION_DEGREES_MIN / ELEVATION_DEGREES_PER_REV);
+    	    	_elevation.setReverseSoftLimit(-ELEVATION_DEGREES_MAX / ELEVATION_DEGREES_PER_REV);
+    	    	break;
+    		case Shot:
+    			_elevation.setForwardSoftLimit(-ELEVATION_SHOT_DEGREES_MIN / ELEVATION_DEGREES_PER_REV);
+    	    	_elevation.setReverseSoftLimit(-ELEVATION_SHOT_DEGREES_MAX / ELEVATION_DEGREES_PER_REV);
+    			break;
+    	}
     }
     
     public void setElevationSpeed(double degreesPerSecond) {

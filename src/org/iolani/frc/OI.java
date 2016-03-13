@@ -11,6 +11,7 @@ import org.iolani.frc.util.JoystickAxisThresholdButton;
 import org.iolani.frc.util.PowerScaler;
 import org.iolani.frc.commands.*;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
+import org.iolani.frc.commands.debug.OperateGimbalManual;
 import org.iolani.frc.commands.debug.OperateGimbalUnsafe;
 //import org.iolani.frc.commands.auto.AutoDriveStraight;
 //import org.iolani.frc.commands.auto.AutoGrabTrashCan;
@@ -40,7 +41,7 @@ public class OI {
     
     private final Button _homePositionButton  = new JoystickButton(_rStick, 3);
     private final Button _loadPositionButton  = new JoystickButton(_lStick, 3);
-    private final Button _clearPositionButton = new JoystickButton(_lStick, 5);
+    private final Button _clearPositionButton = new JoystickButton(_rStick, 4);
     
     private final Button _gunnerEnableButton = new JoystickButton(_rStick, 2);
     
@@ -53,6 +54,7 @@ public class OI {
     private final Button _gunnerFireButton = new ConditionalButton(_gunnerModeState, 
 			new JoystickAxisThresholdButton(_xStick, XSTICK_RTRIGGER_AXIS, 0.25, 1)
 		);
+    private final Button _gunnerSuckButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 6));
     
     /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
     private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
@@ -90,18 +92,19 @@ public class OI {
         _loadPositionButton.whenPressed(new LoadBall());
         _clearPositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Clearance));
         
-        _gunnerEnableButton.whenPressed(new SeekToGunnerPosition());
+        _gunnerEnableButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerNeutral));
         // disable gunner mode on all driver actions affecting gimbal position //
-        _intakeButton.whenPressed(new SetGunnerControlEnabled(false));
-        _outakeButton.whenPressed(new SetGunnerControlEnabled(false));
-        _homePositionButton.whenPressed(new SetGunnerControlEnabled(false));
-        _loadPositionButton.whenPressed(new SetGunnerControlEnabled(false));
-        _clearPositionButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_intakeButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_outakeButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_homePositionButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_loadPositionButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_clearPositionButton.whenPressed(new SetGunnerControlEnabled(false));
         
-        _gunnerFastButton.whileHeld(new OperateGimbalManual());
+        _gunnerFastButton.whileHeld(new OperateGimbalFast());
         _gunnerSlowButton.whileHeld(new OperateGimbalSlow());
         _gunnerSpinButton.whileHeld(new SetShooterWheelSpeed(5500));
         _gunnerFireButton.whileHeld(new SetShooterKicker(true));
+        _gunnerSuckButton.whileHeld(new SetShooterWheelPower(-1.0));
         
         /*_intakeSuckButton.whileHeld(new IntakeBall());
         _intakeBlowButton.whileHeld(new SetIntakeVariablePower(-1.0, RampPosition.Deployed));
@@ -148,7 +151,7 @@ public class OI {
     }
     
     public void setGunnerControlEnabled(boolean enabled) {
-    	_gunnerModeState.setPressed(true);
+    	_gunnerModeState.setPressed(enabled);
     }
     
     public Joystick getGunnerStick() {

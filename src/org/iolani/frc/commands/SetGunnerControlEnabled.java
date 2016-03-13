@@ -18,6 +18,7 @@ public class SetGunnerControlEnabled extends CommandBase {
 	 * @param enabled - should gunner mode be enabled
 	 */
     public SetGunnerControlEnabled(boolean enabled) {
+    	requires(shooterGimbal);
     	_enabled = enabled;
     }
 

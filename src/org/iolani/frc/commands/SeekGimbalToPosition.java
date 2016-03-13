@@ -21,20 +21,24 @@ public class SeekGimbalToPosition extends CommandGroup {
     	
     	switch(pos) {
     		case Home:
+    			this.addSequential(new SetGunnerControlEnabled(false));
     			this.addSequential(new SeekGimbalAzimuth(0.0));
     			this.addSequential(new SeekGimbalElevation(0.0));
     			break;
     		case SlotLoad:
+    			this.addSequential(new SetGunnerControlEnabled(false));
     			this.addSequential(new SeekGimbalAzimuth(0.0));
     			this.addSequential(new SeekGimbalElevation(97.0));
     			break;
     		case Clearance:
+    			this.addSequential(new SetGunnerControlEnabled(false));
     			this.addSequential(new SeekGimbalAzimuth(0.0));
     			this.addSequential(new SeekGimbalElevation(5.0));
     			break;
     		case GunnerNeutral:
     			this.addSequential(new SeekGimbalAzimuth(0.0));
     			this.addSequential(new SeekGimbalElevation(45.0));
+    			this.addSequential(new SetGunnerControlEnabled(true));
     			break;
     		default:
     			throw new IllegalArgumentException("Unknown position: " + pos);

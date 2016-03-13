@@ -4,7 +4,9 @@
  */
 package org.iolani.frc.commands;
 
+import org.iolani.frc.commands.CommandBase;
 import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
+import org.iolani.frc.util.PowerScaler;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
@@ -12,19 +14,21 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  *
  * @author iobotics
  */
-public class OperateGimbalSlow extends CommandBase {
+public class OperateGimbalFast extends CommandBase {
    
-	private static final double SPEED_DEG_PER_SEC = 5;
+	private static final PowerScaler _scaler = new PowerScaler(new PowerScaler.PowerPoint[] {
+            new PowerScaler.PowerPoint(0.0, 0.0),
+            new PowerScaler.PowerPoint(0.5, 0.1),
+            new PowerScaler.PowerPoint(0.95, 0.50),
+            new PowerScaler.PowerPoint(1.0, 1.0)
+        });
 	
-	private double _lastTime;
-	
-    public OperateGimbalSlow() {
+    public OperateGimbalFast() {
         requires(shooterGimbal);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	_lastTime = this.timeSinceInitialized();
     	shooterGimbal.setElevationEnvelope(ElevationEnvelope.Shot);
     }
 
@@ -33,15 +37,17 @@ public class OperateGimbalSlow extends CommandBase {
         double azimuth   = oi.getGunnerStick().getX(Hand.kLeft);
         double elevation = oi.getGunnerStick().getY(Hand.kRight);
         
-        //shooterGimbal.setAzimuthSpeed(azimuth * SPEED_DEG_PER_SEC);
-        //shooterGimbal.setElevationSpeed(elevation * SPEED_DEG_PER_SEC);
+        // signal conditioning //
+        azimuth   = _scaler.get(azimuth);
+        elevation = _scaler.get(elevation);
         
-        double deltaTime = (this.timeSinceInitialized() - _lastTime);
-        double deltaStep = SPEED_DEG_PER_SEC * deltaTime;
-        shooterGimbal.setAzimuthSetpointDegrees(shooterGimbal.getAzimuthDegrees() + azimuth * deltaStep);
-        shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees() + elevation * deltaStep);
+        System.out.println("gimbal: " + azimuth + ", " + elevation);
+        shooterGimbal.setAzimuthPower(azimuth);
+        shooterGimbal.setElevationPower(elevation);
         
-        _lastTime = this.timeSinceInitialized();
+        if(oi.getGunnerStick().getRawButton(1)) {
+        	shooterGimbal.resetEncoders();
+        }
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -52,8 +58,6 @@ public class OperateGimbalSlow extends CommandBase {
     // Called once after isFinished returns true
     protected void end() {
     	shooterGimbal.setElevationEnvelope(ElevationEnvelope.Full);
-    	shooterGimbal.setAzimuthPower(0.0);
-    	shooterGimbal.setElevationPower(0.0);
     }
 
     // Called when another command which requires one or more of the same
