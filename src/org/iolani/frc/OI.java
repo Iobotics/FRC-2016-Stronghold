@@ -54,6 +54,7 @@ public class OI {
     private final Button _gunnerFireButton = new ConditionalButton(_gunnerModeState, 
 			new JoystickAxisThresholdButton(_xStick, XSTICK_RTRIGGER_AXIS, 0.25, 1)
 		);
+    private final Button _gunnerHomeButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 5));
     private final Button _gunnerSuckButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 6));
     
     /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
@@ -105,6 +106,7 @@ public class OI {
         _gunnerSpinButton.whileHeld(new SetShooterWheelSpeed(5500));
         _gunnerFireButton.whileHeld(new SetShooterKicker(true));
         _gunnerSuckButton.whileHeld(new SetShooterWheelPower(-1.0));
+        _gunnerHomeButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Home));
         
         /*_intakeSuckButton.whileHeld(new IntakeBall());
         _intakeBlowButton.whileHeld(new SetIntakeVariablePower(-1.0, RampPosition.Deployed));
