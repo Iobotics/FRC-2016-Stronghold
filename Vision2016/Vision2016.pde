@@ -323,6 +323,13 @@ void draw() {
     }
   }
   
+  // Push data to the network table //
+  double closestXError = getTargetXError(closestTarget);
+  double closestYError = getTargetYError(closestTarget);
+  networkTable.putNumber("vision-x-error", closestXError);
+  networkTable.putNumber("vision-y-error", closestYError);
+  networkTable.putNumber("vision-distance", estimatedDistance);
+  
   // Set rounder //
   rounder = 10;
   
