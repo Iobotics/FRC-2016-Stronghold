@@ -10,9 +10,9 @@ import org.iolani.frc.util.PowerScaler;
  *
  * @author iobotics
  */
-public class OperateArcadeTankDrive extends CommandBase {
+public class OperateArcadeDrive extends CommandBase {
     
-    public OperateArcadeTankDrive() {
+    public OperateArcadeDrive() {
         requires(drivetrain);
     }
 

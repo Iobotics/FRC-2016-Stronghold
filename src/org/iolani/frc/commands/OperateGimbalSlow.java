@@ -4,6 +4,8 @@
  */
 package org.iolani.frc.commands;
 
+import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
+
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 /**
@@ -23,6 +25,7 @@ public class OperateGimbalSlow extends CommandBase {
     // Called just before this Command runs the first time
     protected void initialize() {
     	_lastTime = this.timeSinceInitialized();
+    	shooterGimbal.setElevationEnvelope(ElevationEnvelope.Shot);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -48,6 +51,7 @@ public class OperateGimbalSlow extends CommandBase {
 
     // Called once after isFinished returns true
     protected void end() {
+    	shooterGimbal.setElevationEnvelope(ElevationEnvelope.Full);
     	shooterGimbal.setAzimuthPower(0.0);
     	shooterGimbal.setElevationPower(0.0);
     }

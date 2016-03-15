@@ -3,12 +3,16 @@ package org.iolani.frc;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
+import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
+import org.iolani.frc.util.ConditionalButton;
+import org.iolani.frc.util.JoystickAxisThresholdButton;
 import org.iolani.frc.util.PowerScaler;
 import org.iolani.frc.commands.*;
-import org.iolani.frc.commands.SeekGimbalToPosition.ShooterPosition;
-import org.iolani.frc.subsystems.Intake.RampPosition;
+import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
+import org.iolani.frc.commands.debug.OperateGimbalManual;
+import org.iolani.frc.commands.debug.OperateGimbalUnsafe;
 //import org.iolani.frc.commands.auto.AutoDriveStraight;
 //import org.iolani.frc.commands.auto.AutoGrabTrashCan;
 //import org.iolani.frc.commands.auto.AutoTurn;
@@ -18,14 +22,42 @@ import org.iolani.frc.subsystems.Intake.RampPosition;
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
+	private static final int XSTICK_LTRIGGER_AXIS = 2;
+	private static final int XSTICK_RTRIGGER_AXIS = 3;
+	
+	// persistent virtual button used to store gunner mode state //
+	private final InternalButton _gunnerModeState = new InternalButton();
+	
+	// joysticks //
     private final Joystick _lStick = new Joystick(1);
     private final Joystick _rStick = new Joystick(2);
     private final Joystick _xStick = new Joystick(3);
     
-    private final JoystickButton _intakeSuckButton = new JoystickButton(_rStick, 1);
-    private final JoystickButton _intakeBlowButton = new JoystickButton(_rStick, 2);
+    // driver buttons //
+    private final Button _intakeButton = new JoystickButton(_rStick, 1);
+    private final Button _outakeButton = new JoystickButton(_lStick, 1);
     
-    private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
+    private final Button _ballOperateButton = new JoystickButton(_lStick, 2);
+    
+    private final Button _homePositionButton  = new JoystickButton(_rStick, 3);
+    private final Button _loadPositionButton  = new JoystickButton(_lStick, 3);
+    private final Button _clearPositionButton = new JoystickButton(_rStick, 4);
+    
+    private final Button _gunnerEnableButton = new JoystickButton(_rStick, 2);
+    
+    // gunner buttons //
+    private final Button _gunnerFastButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 3));
+    private final Button _gunnerSlowButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 4));
+    private final Button _gunnerSpinButton = new ConditionalButton(_gunnerModeState, 
+    			new JoystickAxisThresholdButton(_xStick, XSTICK_LTRIGGER_AXIS, 0.25, 1)
+    		);
+    private final Button _gunnerFireButton = new ConditionalButton(_gunnerModeState, 
+			new JoystickAxisThresholdButton(_xStick, XSTICK_RTRIGGER_AXIS, 0.25, 1)
+		);
+    private final Button _gunnerHomeButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 5));
+    private final Button _gunnerSuckButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 6));
+    
+    /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
     private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
     private final JoystickButton _shooterInButton   = new JoystickButton(_lStick, 7);
     
@@ -40,22 +72,7 @@ public class OI {
     private final JoystickButton _gimbalPositionButton3 = new JoystickButton(_xStick, 5);
     private final JoystickButton _gimbalPositionButton4 = new JoystickButton(_xStick, 6);
     private final JoystickButton _gimbalPositionButton5 = new JoystickButton(_xStick, 4);
-    
-    /*
-    private final JoystickButton _elevatorTestButton1    = new JoystickButton(_rStick, 6);
-    private final JoystickButton _elevatorTestButton2    = new JoystickButton(_lStick, 3);
-    
-    private final JoystickButton _elevatorHomeButton     = new JoystickButton(_lStick, 6);
-    
-    private final JoystickButton _grabberCloseButton 	 = new JoystickButton(_lStick, 5);
-    private final JoystickButton _grabberOpenButton		 = new JoystickButton(_rStick, 4);
-    
-    private final JoystickButton _navCalibrateButton     = new JoystickButton(_lStick, 7);
-    
-    private final JoystickButton _autoTestButton1        = new JoystickButton(_lStick, 8);
-    private final JoystickButton _autoTestButton2        = new JoystickButton(_lStick, 9);
-    private final JoystickButton _autoTestButton3        = new JoystickButton(_lStick, 10);
-    private final JoystickButton _autoTestButton4        = new JoystickButton(_lStick, 11);*/
+    */
     
     private final PowerScaler _scaler;
     
@@ -69,8 +86,29 @@ public class OI {
                 new PowerScaler.PowerPoint(0.90, 1.0)
             });
         
-        //_intakeSuckButton.whileHeld(new SetIntakeVariablePower(1.0));
-        _intakeSuckButton.whileHeld(new SuckBall());
+        _intakeButton.whileHeld(new IntakeBall());
+        _outakeButton.whileHeld(new OutakeBall());
+        
+        _homePositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Home));
+        _loadPositionButton.whenPressed(new LoadBall());
+        _clearPositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Clearance));
+        
+        _gunnerEnableButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerNeutral));
+        // disable gunner mode on all driver actions affecting gimbal position //
+        //_intakeButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_outakeButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_homePositionButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_loadPositionButton.whenPressed(new SetGunnerControlEnabled(false));
+        //_clearPositionButton.whenPressed(new SetGunnerControlEnabled(false));
+        
+        _gunnerFastButton.whileHeld(new OperateGimbalFast());
+        _gunnerSlowButton.whileHeld(new OperateGimbalSlow());
+        _gunnerSpinButton.whileHeld(new SetShooterWheelSpeed(5500));
+        _gunnerFireButton.whileHeld(new SetShooterKicker(true));
+        _gunnerSuckButton.whileHeld(new SetShooterWheelPower(-1.0));
+        _gunnerHomeButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Home));
+        
+        /*_intakeSuckButton.whileHeld(new IntakeBall());
         _intakeBlowButton.whileHeld(new SetIntakeVariablePower(-1.0, RampPosition.Deployed));
         
         _shooterKickButton.whileHeld(new SetShooterKicker(true));
@@ -87,22 +125,9 @@ public class OI {
         _gimbalPositionButton2.whileHeld(new OperateGimbalManual());
         _gimbalPositionButton3.whenPressed(new SeekGimbalToPosition(ShooterPosition.Home));
         _gimbalPositionButton4.whenPressed(new SeekGimbalToPosition(ShooterPosition.SlotLoad));
-        _gimbalPositionButton5.whileHeld(new OperateGimbalSlow());
+        _gimbalPositionButton5.whileHeld(new OperateGimbalSlow());*/
         
-        /*_elevatorUpOneButton.whenPressed(new JogElevatorToteHeight(true));
-        _elevatorDownOneButton.whenPressed(new JogElevatorToteHeight(false));
-        
-        _elevatorUpButton.whileHeld(new SetElevatorPower(1.0));
-        _elevatorDownButton.whileHeld(new SetElevatorPower(-0.5));
-        
-        _elevatorTestButton1.whenPressed(new SetElevatorHeight(10.0));
-        _elevatorTestButton2.whenPressed(new SetElevatorHeight(0.0));
-        
-        _elevatorHomeButton.whenPressed(new HomeElevator());
-        
-        _grabberOpenButton.whenPressed(new SetGrabberGrabbed(false));
-        _grabberCloseButton.whenPressed(new SetGrabberGrabbed(true));
-        
+        /*
         _navCalibrateButton.whenPressed(new CalibrateNavigationSensor());
         
         _autoTestButton1.whenPressed(new AutoDriveStraight(36));
@@ -117,6 +142,18 @@ public class OI {
     
     public Joystick getRightStick() {
         return _rStick;
+    }
+    
+    public Button getBallOperateButton() {
+    	return _ballOperateButton;
+    }
+    
+    public boolean getGunnerControlEnabled() {
+    	return _gunnerModeState.get();
+    }
+    
+    public void setGunnerControlEnabled(boolean enabled) {
+    	_gunnerModeState.setPressed(enabled);
     }
     
     public Joystick getGunnerStick() {
