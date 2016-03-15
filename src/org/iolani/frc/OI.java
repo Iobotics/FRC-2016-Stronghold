@@ -54,15 +54,17 @@ public class OI {
     private final Button _gunnerFireButton = new ConditionalButton(_gunnerModeState, 
 			new JoystickAxisThresholdButton(_xStick, XSTICK_RTRIGGER_AXIS, 0.25, 1)
 		);
-    private final Button _gunnerHomeButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 5));
-    private final Button _gunnerSuckButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 6));
+    private final Button _gunnerHomeButton   = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 5));
+    private final Button _gunnerSuckButton   = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 6));
+    private final Button _gunnerDriveButton  = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 1));
+    private final Button _gunnerVisionButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 2));
     
     /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
     private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
     private final JoystickButton _shooterInButton   = new JoystickButton(_lStick, 7);
     
-    private final JoystickButton _shooterOutButton2 = new JoystickButton(_lStick, 9);
     private final JoystickButton _shooterInButton2  = new JoystickButton(_lStick, 8);
+    private final JoystickButton _shooterOutButton2 = new JoystickButton(_lStick, 9);
     
     private final JoystickButton _shooterOutButton3 = new JoystickButton(_lStick, 11);
     private final JoystickButton _shooterInButton3  = new JoystickButton(_lStick, 10);
@@ -94,12 +96,6 @@ public class OI {
         _clearPositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Clearance));
         
         _gunnerEnableButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerNeutral));
-        // disable gunner mode on all driver actions affecting gimbal position //
-        //_intakeButton.whenPressed(new SetGunnerControlEnabled(false));
-        //_outakeButton.whenPressed(new SetGunnerControlEnabled(false));
-        //_homePositionButton.whenPressed(new SetGunnerControlEnabled(false));
-        //_loadPositionButton.whenPressed(new SetGunnerControlEnabled(false));
-        //_clearPositionButton.whenPressed(new SetGunnerControlEnabled(false));
         
         _gunnerFastButton.whileHeld(new OperateGimbalFast());
         _gunnerSlowButton.whileHeld(new OperateGimbalSlow());
@@ -108,25 +104,8 @@ public class OI {
         _gunnerSuckButton.whileHeld(new SetShooterWheelPower(-1.0));
         _gunnerHomeButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Home));
         
-        /*_intakeSuckButton.whileHeld(new IntakeBall());
-        _intakeBlowButton.whileHeld(new SetIntakeVariablePower(-1.0, RampPosition.Deployed));
-        
-        _shooterKickButton.whileHeld(new SetShooterKicker(true));
-        _shooterOutButton.whileHeld(new SetShooterWheelPower(0.2));
-        _shooterInButton.whileHeld(new SetShooterWheelPower(-0.2));
-        
-        _shooterOutButton2.whileHeld(new SetShooterWheelPower(1.0));
-        _shooterInButton2.whileHeld(new SetShooterWheelPower(-1.0));
-        
-        _shooterOutButton3.whileHeld(new SetShooterWheelSpeed(5500));
-        _shooterInButton3.whileHeld(new SetShooterWheelSpeed(-5500));
-        
-        _gimbalPositionButton.whileHeld(new OperateGimbalUnsafe());
-        _gimbalPositionButton2.whileHeld(new OperateGimbalManual());
-        _gimbalPositionButton3.whenPressed(new SeekGimbalToPosition(ShooterPosition.Home));
-        _gimbalPositionButton4.whenPressed(new SeekGimbalToPosition(ShooterPosition.SlotLoad));
-        _gimbalPositionButton5.whileHeld(new OperateGimbalSlow());*/
-        
+        _gunnerDriveButton.whileHeld(new OperateGunnerDrive());
+        //_gunnerVisionButton.whileHeld(new );
         /*
         _navCalibrateButton.whenPressed(new CalibrateNavigationSensor());
         
