@@ -319,7 +319,8 @@ void draw() {
     target = filteredBlobs.get(i);
     // Target crosshair //
     strokeWeight(1);
-    stroke((target == closestTarget) ? 250 : 110, 100, 100); //Green
+    if (target == closestTarget) stroke(110, 100, 100);
+    else stroke(50, 100, 70);
     line(target.x * cameraWidth, (target.y * cameraHeight) + 50, target.x * cameraWidth, (target.y * cameraHeight) - 50);
     line((target.x * cameraWidth) - 50, target.y * cameraHeight, (target.x * cameraWidth) + 50, target.y * cameraHeight);
     
