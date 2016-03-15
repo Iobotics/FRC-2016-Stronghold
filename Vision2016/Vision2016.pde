@@ -304,6 +304,13 @@ void draw() {
     text("Y error: " + round(getTargetYError(closestTarget) * rounder) / rounder, 60, 60);
     text("Estimated distance: " + round(estimatedDistance * rounder) / rounder, 60, 90);
     text("Y Height: " + round((cameraHeight - (closestTarget.y * cameraHeight)) * rounder) / rounder, 60, 120);
+  
+    // Push data to the network table //
+    double closestXError = getTargetXError(closestTarget);
+    double closestYError = getTargetYError(closestTarget);
+    networkTable.putNumber("vision-x-error", closestXError);
+    networkTable.putNumber("vision-y-error", closestYError);
+    networkTable.putNumber("vision-distance", estimatedDistance);
   }
   
   // Show targets and play sounds //
@@ -322,13 +329,6 @@ void draw() {
       leastError = error;
     }
   }
-  
-  // Push data to the network table //
-  double closestXError = getTargetXError(closestTarget);
-  double closestYError = getTargetYError(closestTarget);
-  networkTable.putNumber("vision-x-error", closestXError);
-  networkTable.putNumber("vision-y-error", closestYError);
-  networkTable.putNumber("vision-distance", estimatedDistance);
   
   // Set rounder //
   rounder = 10;
