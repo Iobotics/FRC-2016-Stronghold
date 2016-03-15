@@ -2,6 +2,8 @@ import gab.opencv.*;
 
 import ipcapture.*;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+
 // ***NOTE*** Requires installing (through Processing) three libraries: Minim, Video, and BlobDetection //
 import processing.video.*; //Used for cameras connected to this computer
 import processing.net.*;
@@ -88,6 +90,11 @@ float lockedErrorMax = 0.2; //Maximum error to play the "target locked" sound...
 // OpenCV //
 OpenCV opencv;
 
+// Network tables //
+final String networkTableAddress = "10.24.38.227";
+NetworkTable networkTable;
+final String networkTableName = "SmartDashboard";
+
 void setup() {
   // Set up Processing constants //  
   colorMode(HSB, hueMax, satMax, valMax);
@@ -98,6 +105,11 @@ void setup() {
   stroke(0.0, 100.0, 100.0); //Red stroke
   size(640, 480);
   frameRate(10);
+  
+  // Initialize network table //
+  NetworkTable.setClientMode();
+  NetworkTable.setIPAddress(networkTableAddress);
+  networkTable = NetworkTable.getTable(networkTableName);
   
   // Initialize sound //
   minim = new Minim(this);
@@ -250,11 +262,11 @@ void draw() {
   int displayBufferIncrement = 30;
   int displayBuffer = 30;
   Blob target;
+  float rounder = 1000.0; //Quick and dirty rounding to this number's digits
   for (int i = 0; i < filteredBlobs.size(); i++) {
     target = filteredBlobs.get(i);
     
     // Text //
-    float rounder = 1000.0; //Quick and dirty rounding to this number's digits
     noStroke();
     text("Target " + (i + 1) + " :", 20, displayBuffer);
     displayBuffer += displayBufferIncrement;
@@ -279,6 +291,16 @@ void draw() {
       leastError = error;
     }
   }
+  
+  // Set rounder //
+  rounder = 10;
+  
+  // Get network table data //
+  float elevationAngle = (float) networkTable.getNumber("gimbal-elevation-position", 0.0);
+  float elevationAngleRounded = round(elevationAngle * rounder) / rounder;
+  
+  // Display non-target-based data //
+  text("Elevation angle: " + elevationAngleRounded, cameraWidth - 250, cameraHeight - 15);
   
   // Camera crosshair //
   stroke(0, 100, 100);
