@@ -255,33 +255,64 @@ void draw() {
   
   println("Bar length: " + barLength);
   println("Estimated distance: " + estimatedDistance);
+ 
+  // Find closest blob by azimuth //
+  Blob closestTarget = null;
   
-  // Show target reports and play sounds //
-  textSize(23);
-  fill(255);
-  int displayBufferIncrement = 30;
-  int displayBuffer = 30;
-  Blob target;
+  for (Blob blob : filteredBlobs) {
+    if (closestTarget == null) {
+      closestTarget = blob;
+    } else if (abs(closestTarget.x - imageCenterX) > abs(blob.x - imageCenterX)) {
+      closestTarget = blob;
+    }
+  }
+  
+  // Sort target list by nearness to screen center (azimuth) //
+  //ArrayList<Blob> orderedBlobs = new ArrayList<Blob>();
+  //Blob examinedBlob;
+  
+  /*
+  for (int i = 0; i < filteredBlobs.size(); i++) {
+    examinedBlob = filteredBlobs.get(i);
+    if (orderedBlobs.size() == 0) {
+      orderedBlobs.add(examinedBlob);
+    } else {
+      boolean addedBlob = false;
+      for (int j = 0; j < orderedBlobs.size(); j++) {
+        if (abs(examinedBlob.x - imageCenterX) < abs(orderedBlobs.get(j).x - imageCenterX)) { //If the examined blob is closer to the center, insert it before this one in the list
+          orderedBlobs.add(j, examinedBlob);
+          addedBlob = true;
+          break;
+        }
+        
+        if (!addedBlob) orderedBlobs.add(examinedBlob); //If the target doesn't belong earlier in the list, add it to the end
+      }
+    }
+  }
+  */
+  
   float rounder = 1000.0; //Quick and dirty rounding to this number's digits
+  
+  if (closestTarget != null) {
+    // Target report / sound of closest target //
+    textSize(23);
+    fill(255);
+    
+    // Display text //
+    noStroke();
+    text("X error: " + round(getTargetXError(closestTarget) * rounder) / rounder, 60, 30);
+    text("Y error: " + round(getTargetYError(closestTarget) * rounder) / rounder, 60, 60);
+    text("Estimated distance: " + round(estimatedDistance * rounder) / rounder, 60, 90);
+    text("Y Height: " + round((cameraHeight - (closestTarget.y * cameraHeight)) * rounder) / rounder, 60, 120);
+  }
+  
+  // Show targets and play sounds //
+  Blob target;
   for (int i = 0; i < filteredBlobs.size(); i++) {
     target = filteredBlobs.get(i);
-    
-    // Text //
-    noStroke();
-    text("Target " + (i + 1) + " :", 20, displayBuffer);
-    displayBuffer += displayBufferIncrement;
-    text("X error: " + round(getTargetXError(target) * rounder) / rounder, 60, displayBuffer);
-    displayBuffer += displayBufferIncrement;
-    text("Y error: " + round(getTargetYError(target) * rounder) / rounder, 60, displayBuffer);
-    displayBuffer += displayBufferIncrement;
-    text("Estimated distance: " + round(estimatedDistance * rounder) / rounder, 60, displayBuffer);
-    displayBuffer += displayBufferIncrement;
-    text("Y Height: " + round((cameraHeight - (target.y * cameraHeight)) * rounder) / rounder, 60, displayBuffer);
-    displayBuffer += displayBufferIncrement;
-    
     // Target crosshair //
     strokeWeight(1);
-    stroke(110, 100, 100); //Green
+    stroke((target == closestTarget) ? 250 : 110, 100, 100); //Green
     line(target.x * cameraWidth, (target.y * cameraHeight) + 50, target.x * cameraWidth, (target.y * cameraHeight) - 50);
     line((target.x * cameraWidth) - 50, target.y * cameraHeight, (target.x * cameraWidth) + 50, target.y * cameraHeight);
     
