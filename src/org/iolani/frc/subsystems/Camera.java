@@ -6,8 +6,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import org.iolani.frc.RobotMap;
-import org.iolani.frc.commands.SetCameraPosition;
-import org.iolani.frc.commands.debug.OperateCameraServo;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.command.Subsystem;

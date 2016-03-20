@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.iolani.frc.RobotMap;
 import org.iolani.frc.commands.OperateArcadeDrive;
-import org.iolani.frc.commands.OperateTankDrive;
 import org.iolani.frc.util.Utility;
 
 /**

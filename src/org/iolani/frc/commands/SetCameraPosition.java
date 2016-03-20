@@ -1,8 +1,5 @@
 package org.iolani.frc.commands;
 
-import org.iolani.frc.subsystems.Camera;
-import org.iolani.frc.subsystems.Intake;
-import org.iolani.frc.subsystems.Intake.RampPosition;
 
 /**
  *
