@@ -4,21 +4,15 @@
  */
 package org.iolani.frc.commands;
 
+
 /**
  *
  * @author iobotics
  */
-public class OperateTankDrive extends CommandBase {
+public class OperateGunnerDrive extends CommandBase {
     
-	private final boolean _scaledInput;
-	
-	public OperateTankDrive() {
-		this(true);
-	}
-	
-    public OperateTankDrive(boolean scaledInput) {
+    public OperateGunnerDrive() {
         requires(drivetrain);
-        _scaledInput = scaledInput;
     }
 
     // Called just before this Command runs the first time
@@ -27,12 +21,12 @@ public class OperateTankDrive extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double left  = oi.getLeftStick().getY();
-    	double right = oi.getRightStick().getY();
+        double mag = oi.getGunnerStick().getY() / 2;
+        double rot = oi.getGunnerStick().getX() / 1.5;
         
-        
+        // signal conditioning //
         //System.out.println("joysticks: " + mag + ", " + rot);
-        drivetrain.setTank(left, right, _scaledInput);
+        drivetrain.setArcade(mag, rot, true);
     }
 
     // Make this return true when this Command no longer needs to run execute()

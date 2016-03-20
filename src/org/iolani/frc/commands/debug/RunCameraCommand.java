@@ -2,42 +2,37 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.iolani.frc.commands;
+package org.iolani.frc.commands.debug;
+
+import org.iolani.frc.commands.CommandBase;
+import org.iolani.frc.subsystems.Camera;
 
 /**
  *
  * @author iobotics
  */
-public class OperateTankDrive extends CommandBase {
-    
-	private final boolean _scaledInput;
+public class RunCameraCommand extends CommandBase {
+   
+	private final Camera.CameraCommand _cmd;
 	
-	public OperateTankDrive() {
-		this(true);
-	}
-	
-    public OperateTankDrive(boolean scaledInput) {
-        requires(drivetrain);
-        _scaledInput = scaledInput;
+    public RunCameraCommand(Camera.CameraCommand cmd) {
+        requires(camera);
+        _cmd = cmd;
+        this.setRunWhenDisabled(true);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	camera.sendCommand(_cmd);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double left  = oi.getLeftStick().getY();
-    	double right = oi.getRightStick().getY();
-        
-        
-        //System.out.println("joysticks: " + mag + ", " + rot);
-        drivetrain.setTank(left, right, _scaledInput);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+        return true;
     }
 
     // Called once after isFinished returns true

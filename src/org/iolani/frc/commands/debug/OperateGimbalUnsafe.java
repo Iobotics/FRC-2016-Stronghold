@@ -39,7 +39,7 @@ public class OperateGimbalUnsafe extends CommandBase {
         azimuth   = _scaler.get(azimuth);
         elevation = _scaler.get(elevation);
         
-        System.out.println("gimbal: " + azimuth + ", " + elevation);
+        //System.out.println("gimbal: " + azimuth + ", " + elevation);
         shooterGimbal.setAzimuthPower(azimuth);
         shooterGimbal.setElevationPower(elevation);
         

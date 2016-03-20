@@ -18,6 +18,7 @@ public class OperateLoadBallCapture extends CommandBase {
 	
     public OperateLoadBallCapture() {
     	requires(shooterWheels);
+    	//requires(camera);
     }
 
     protected void initialize() {

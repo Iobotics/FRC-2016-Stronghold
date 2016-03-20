@@ -11,8 +11,9 @@ import org.iolani.frc.util.JoystickAxisThresholdButton;
 import org.iolani.frc.util.PowerScaler;
 import org.iolani.frc.commands.*;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
-import org.iolani.frc.commands.debug.OperateGimbalManual;
-import org.iolani.frc.commands.debug.OperateGimbalUnsafe;
+import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
+import org.iolani.frc.commands.debug.RunCameraCommand;
+import org.iolani.frc.subsystems.Camera.CameraCommand;
 //import org.iolani.frc.commands.auto.AutoDriveStraight;
 //import org.iolani.frc.commands.auto.AutoGrabTrashCan;
 //import org.iolani.frc.commands.auto.AutoTurn;
@@ -24,6 +25,9 @@ import org.iolani.frc.commands.debug.OperateGimbalUnsafe;
 public class OI {
 	private static final int XSTICK_LTRIGGER_AXIS = 2;
 	private static final int XSTICK_RTRIGGER_AXIS = 3;
+	
+	// persistent virtual button used to store home mode state //
+	private final InternalButton _homeModeState = new InternalButton();
 	
 	// persistent virtual button used to store gunner mode state //
 	private final InternalButton _gunnerModeState = new InternalButton();
@@ -38,6 +42,7 @@ public class OI {
     private final Button _outakeButton = new JoystickButton(_lStick, 1);
     
     private final Button _ballOperateButton = new JoystickButton(_lStick, 2);
+    private final Button _cameraSpyButton   = new ConditionalButton(_homeModeState, new JoystickButton(_lStick, 5));
     
     private final Button _homePositionButton  = new JoystickButton(_rStick, 3);
     private final Button _loadPositionButton  = new JoystickButton(_lStick, 3);
@@ -58,6 +63,10 @@ public class OI {
     private final Button _gunnerSuckButton   = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 6));
     private final Button _gunnerDriveButton  = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 1));
     private final Button _gunnerVisionButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 2));
+    
+    // debug buttons //
+    private final Button _cameraStartButton = new JoystickButton(_lStick, 9);
+    private final Button _cameraStopButton = new JoystickButton(_lStick, 8);
     
     /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
     private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
@@ -95,6 +104,9 @@ public class OI {
         _loadPositionButton.whenPressed(new LoadBall());
         _clearPositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Clearance));
         
+        // broken for now //
+        //_cameraSpyButton.whileHeld(new SetCameraPosition(CameraPosition.IntakeSight));
+        
         _gunnerEnableButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerNeutral));
         
         _gunnerFastButton.whileHeld(new OperateGimbalFast());
@@ -105,7 +117,12 @@ public class OI {
         _gunnerHomeButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Home));
         
         _gunnerDriveButton.whileHeld(new OperateGunnerDrive());
-        //_gunnerVisionButton.whileHeld(new );
+        _gunnerVisionButton.whileHeld(new SeekGimbalToVision());
+        
+        // debugging (not currently working) //
+        _cameraStartButton.whenPressed(new RunCameraCommand(CameraCommand.Start));
+        _cameraStopButton.whenPressed(new RunCameraCommand(CameraCommand.Stop));
+        
         /*
         _navCalibrateButton.whenPressed(new CalibrateNavigationSensor());
         
@@ -125,6 +142,14 @@ public class OI {
     
     public Button getBallOperateButton() {
     	return _ballOperateButton;
+    }
+    
+    public boolean getHomeStateEnabled() {
+    	return _homeModeState.get();
+    }
+    
+    public void setHomeStateEnabled(boolean enabled) {
+    	_homeModeState.setPressed(enabled);
     }
     
     public boolean getGunnerControlEnabled() {

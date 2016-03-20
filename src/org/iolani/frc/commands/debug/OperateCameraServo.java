@@ -2,23 +2,21 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.iolani.frc.commands;
+package org.iolani.frc.commands.debug;
+
+import org.iolani.frc.commands.CommandBase;
+
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  * @author iobotics
  */
-public class OperateTankDrive extends CommandBase {
-    
-	private final boolean _scaledInput;
+public class OperateCameraServo extends CommandBase {
 	
-	public OperateTankDrive() {
-		this(true);
-	}
-	
-    public OperateTankDrive(boolean scaledInput) {
-        requires(drivetrain);
-        _scaledInput = scaledInput;
+    public OperateCameraServo() {
+        requires(camera);
     }
 
     // Called just before this Command runs the first time
@@ -27,12 +25,7 @@ public class OperateTankDrive extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double left  = oi.getLeftStick().getY();
-    	double right = oi.getRightStick().getY();
-        
-        
-        //System.out.println("joysticks: " + mag + ", " + rot);
-        drivetrain.setTank(left, right, _scaledInput);
+        camera.setServoPosition((oi.getLeftStick().getTwist() + 1) / 2);
     }
 
     // Make this return true when this Command no longer needs to run execute()

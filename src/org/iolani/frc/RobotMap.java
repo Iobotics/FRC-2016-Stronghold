@@ -32,5 +32,5 @@ public class RobotMap {
     public static final int shooterKickValve  = 0;
     
     // camera //
-    public static final String cameraName = "cam0";
+    public static final int cameraPWM = 0;
 }

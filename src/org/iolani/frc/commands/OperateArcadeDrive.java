@@ -31,7 +31,7 @@ public class OperateArcadeDrive extends CommandBase {
             mag = driveScale.get(mag);
             rot *= Math.abs(rot); // rot^2 preserving sign //
         }
-        System.out.println("joysticks: " + mag + ", " + rot);
+        //System.out.println("joysticks: " + mag + ", " + rot);
         drivetrain.setArcade(mag, rot);
     }
 

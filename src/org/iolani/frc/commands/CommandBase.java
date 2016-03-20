@@ -48,7 +48,7 @@ public abstract class CommandBase extends Command {
         shooterKicker.init();
         shooterWheels.init();
         shooterGimbal.init();
-        //camera.init();
+        camera.init();
     }
 
     public CommandBase(String name) {

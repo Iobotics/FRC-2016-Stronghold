@@ -6,9 +6,6 @@ package org.iolani.frc.commands;
 
 import org.iolani.frc.commands.CommandBase;
 import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
-import org.iolani.frc.util.PowerScaler;
-
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 /**
  *
@@ -16,12 +13,11 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  */
 public class OperateGimbalFast extends CommandBase {
    
-	private static final PowerScaler _scaler = new PowerScaler(new PowerScaler.PowerPoint[] {
+	/*private static final PowerScaler _scaler = new PowerScaler(new PowerScaler.PowerPoint[] {
             new PowerScaler.PowerPoint(0.0, 0.0),
             new PowerScaler.PowerPoint(0.5, 0.1),
-            new PowerScaler.PowerPoint(0.95, 0.50),
-            new PowerScaler.PowerPoint(1.0, 1.0)
-        });
+            new PowerScaler.PowerPoint(1.0, 0.4)
+        });*/
 	
     public OperateGimbalFast() {
         requires(shooterGimbal);
@@ -34,14 +30,16 @@ public class OperateGimbalFast extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        double azimuth   = oi.getGunnerStick().getX(Hand.kLeft);
-        double elevation = oi.getGunnerStick().getY(Hand.kRight);
+        double azimuth   = oi.getGunnerStick().getX();
+        double elevation = oi.getGunnerStick().getY();
         
         // signal conditioning //
-        azimuth   = _scaler.get(azimuth);
-        elevation = _scaler.get(elevation);
+        //azimuth   = _scaler.get(azimuth);
+        azimuth *= 0.3;
+        //elevation = _scaler.get(elevation);
+        elevation *= 0.3;
         
-        System.out.println("gimbal: " + azimuth + ", " + elevation);
+        //System.out.println("gimbal: " + azimuth + ", " + elevation);
         shooterGimbal.setAzimuthPower(azimuth);
         shooterGimbal.setElevationPower(elevation);
         

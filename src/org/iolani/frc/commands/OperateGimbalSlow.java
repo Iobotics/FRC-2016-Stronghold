@@ -14,9 +14,10 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  */
 public class OperateGimbalSlow extends CommandBase {
    
-	private static final double SPEED_DEG_PER_SEC = 5;
+	private static final double SPEED_DEG_PER_SEC = 10;
 	
 	private double _lastTime;
+	private int    _lastPOV;
 	
     public OperateGimbalSlow() {
         requires(shooterGimbal);
@@ -31,7 +32,7 @@ public class OperateGimbalSlow extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
         double azimuth   = oi.getGunnerStick().getX(Hand.kLeft);
-        double elevation = oi.getGunnerStick().getY(Hand.kRight);
+        double elevation = oi.getGunnerStick().getY(Hand.kLeft);
         
         //shooterGimbal.setAzimuthSpeed(azimuth * SPEED_DEG_PER_SEC);
         //shooterGimbal.setElevationSpeed(elevation * SPEED_DEG_PER_SEC);
@@ -41,6 +42,18 @@ public class OperateGimbalSlow extends CommandBase {
         shooterGimbal.setAzimuthSetpointDegrees(shooterGimbal.getAzimuthDegrees() + azimuth * deltaStep);
         shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees() + elevation * deltaStep);
         
+        int pov = oi.getGunnerStick().getPOV(); 
+        if(pov != _lastPOV) {
+        	switch(pov) {
+        		case 0:
+        			shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees() - 1);
+        			break;
+        		case 180:
+        			shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees() + 1);
+        			break;
+        	}
+        	_lastPOV = pov;
+        }
         _lastTime = this.timeSinceInitialized();
     }
 

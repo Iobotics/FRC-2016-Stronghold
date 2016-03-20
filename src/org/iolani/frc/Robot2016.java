@@ -2,7 +2,7 @@
 package org.iolani.frc;
 
 import org.iolani.frc.commands.*;
-//import org.iolani.frc.commands.auto.*;
+import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -94,6 +94,9 @@ public class Robot2016 extends IterativeRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
         if (_autoCommand != null) _autoCommand.cancel();
+        
+        // home the shooter // 
+        new SeekGimbalToPosition(GimbalPosition.Home).start();
     }
 
     /**
@@ -114,7 +117,9 @@ public class Robot2016 extends IterativeRobot {
         CommandBase.shooterWheels.debug();
         CommandBase.shooterGimbal.debug();
         CommandBase.drivetrain.debug();
+        SmartDashboard.putBoolean("home-mode", CommandBase.oi.getHomeStateEnabled());
         SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
+        CommandBase.camera.debug();
 //        CommandBase.navsensor.debug();
     }
     

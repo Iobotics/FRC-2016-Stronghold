@@ -1,5 +1,7 @@
 package org.iolani.frc.commands;
 
+import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
+
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
@@ -10,6 +12,11 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
  */
 public class SeekGimbalToPosition extends CommandGroup {
     
+	private static final double HOME_ELEVATION_ANGLE      = 0.0;
+	private static final double LOAD_ELEVATION_ANGLE      = 96.0;
+	private static final double CLEARANCE_ELEVATION_ANGLE = 5.0;
+	private static final double SHOT_ELEVATION_ANGLE      = 45.0;
+	
 	public enum GimbalPosition {
 		Home,
 		SlotLoad,
@@ -21,23 +28,30 @@ public class SeekGimbalToPosition extends CommandGroup {
     	
     	switch(pos) {
     		case Home:
-    			this.addSequential(new SetGunnerControlEnabled(false));
+    			this.addParallel(new SetGunnerControlEnabled(false));
+    			this.addParallel(new SetCameraPosition(CameraPosition.Stowed));
     			this.addSequential(new SeekGimbalAzimuth(0.0));
-    			this.addSequential(new SeekGimbalElevation(0.0));
+    			this.addSequential(new SeekGimbalElevation(HOME_ELEVATION_ANGLE));
+    			this.addSequential(new SetHomeStateEnabled(true));
     			break;
     		case SlotLoad:
-    			this.addSequential(new SetGunnerControlEnabled(false));
+    			this.addParallel(new SetHomeStateEnabled(false));
+    			this.addParallel(new SetGunnerControlEnabled(false));
+    			this.addParallel(new SetCameraPosition(CameraPosition.Stowed));
     			this.addSequential(new SeekGimbalAzimuth(0.0));
-    			this.addSequential(new SeekGimbalElevation(97.0));
+    			this.addSequential(new SeekGimbalElevation(LOAD_ELEVATION_ANGLE));
     			break;
     		case Clearance:
+    			this.addParallel(new SetHomeStateEnabled(false));
     			this.addSequential(new SetGunnerControlEnabled(false));
     			this.addSequential(new SeekGimbalAzimuth(0.0));
-    			this.addSequential(new SeekGimbalElevation(5.0));
+    			this.addSequential(new SeekGimbalElevation(CLEARANCE_ELEVATION_ANGLE));
     			break;
     		case GunnerNeutral:
+    			this.addParallel(new SetHomeStateEnabled(false));
+    			this.addSequential(new SetCameraPosition(CameraPosition.ShotOptimal));
     			this.addSequential(new SeekGimbalAzimuth(0.0));
-    			this.addSequential(new SeekGimbalElevation(45.0));
+    			this.addSequential(new SeekGimbalElevation(SHOT_ELEVATION_ANGLE));
     			this.addSequential(new SetGunnerControlEnabled(true));
     			break;
     		default:
