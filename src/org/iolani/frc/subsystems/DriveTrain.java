@@ -6,6 +6,7 @@
 package org.iolani.frc.subsystems;
 
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -28,30 +29,25 @@ public class DriveTrain extends Subsystem {
     private CANTalon      _right;
     private CANTalon      _rightSlave1;
     private CANTalon      _rightSlave2;
-    private Encoder       _lEncoder;
-    private Encoder       _rEncoder;
-    //private PIDController _lPID;
-    //private PIDController _rPID;
-    //private PIDOutput     _lPIDOutput;
-    //private PIDOutput     _rPIDOutput;
     
 	// physical constants //
-	private static final double WHEEL_DIAMETER_INCHES = 8.0;
-	private static final double WHEEL_INCHES_PER_REV = Math.PI * WHEEL_DIAMETER_INCHES;
-	// encoder constants //
-	private static final int    ENCODER_TICKS_PER_REV = 128;
-	private static final double ENCODER_INCH_PER_TICK = WHEEL_INCHES_PER_REV / ENCODER_TICKS_PER_REV;
-	// PID control constants //
-	//private static final double kP = 0.25;
-	//private static final double kI = 0.0;
-	//private static final double kD = 0.3;
-    
+	private static final double WHEEL_DIAMETER_INCHES  = 8.0;
+	private static final double WHEEL_INCHES_PER_REV   = Math.PI * WHEEL_DIAMETER_INCHES;
+	private static final int    ENCODER_TICKS_PER_REV  = 128;
+	private static final int    ENCODER_PINION_TEETH   = 12;
+	private static final int    WHEEL_GEAR_TEETH       = 132;
+	private static final double ENCODER_INCHES_PER_REV = WHEEL_INCHES_PER_REV * ENCODER_PINION_TEETH / WHEEL_GEAR_TEETH;
+	
     public void init()  {
     	System.out.println("drive init start");
     	
         // configure left //
     	_left = new CANTalon(RobotMap.driveLeftMain);
     	_left.setInverted(true);
+    	_left.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+    	_left.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
+    	_left.reverseSensor(true);
+    	_left.setPosition(0.0);
         _leftSlave1  = new CANTalon(RobotMap.driveLeftSlave1);
         _leftSlave1.changeControlMode(TalonControlMode.Follower);
         _leftSlave1.set(_left.getDeviceID());
@@ -61,17 +57,15 @@ public class DriveTrain extends Subsystem {
         
         // configure right //
         _right = new CANTalon(RobotMap.driveRightMain);
+        _right.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+        _right.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
+        _right.setPosition(0.0);
         _rightSlave1 = new CANTalon(RobotMap.driveRightSlave1);
         _rightSlave1.changeControlMode(TalonControlMode.Follower);
         _rightSlave1.set(_right.getDeviceID());
         _rightSlave2 = new CANTalon(RobotMap.driveRightSlave2);
         _rightSlave2.changeControlMode(TalonControlMode.Follower);
         _rightSlave2.set(_right.getDeviceID());
-        
-        _lEncoder = new Encoder(RobotMap.driveLeftEncoderB, RobotMap.driveLeftEncoderA);
-        _lEncoder.setDistancePerPulse(ENCODER_INCH_PER_TICK);
-        _rEncoder = new Encoder(RobotMap.driveRightEncoderA, RobotMap.driveRightEncoderB);
-        _rEncoder.setDistancePerPulse(ENCODER_INCH_PER_TICK);
         
        // _lPID = new PIDController(kP, kI, kD, _lEncoder, _lPIDOutput);
         //_rPID = new PIDController(kP, kI, kD, _rEncoder, _rPIDOutput);
@@ -181,21 +175,21 @@ public class DriveTrain extends Subsystem {
         this.setTank(leftMotorSpeed, rightMotorSpeed);
     }
     
-    public Encoder getLeftEncoder() {
-    	return _lEncoder;
+    public double getLeftEncoderDistance() {
+    	return _left.getPosition() * ENCODER_INCHES_PER_REV;
     }
     
-    public Encoder getRightEncoder() {
-    	return _rEncoder;
+    public double getRightEncoderDistance() {
+    	return _right.getPosition() * ENCODER_INCHES_PER_REV;
     }
     
     public void debug() {
     	//SmartDashboard.putData("drive-left-encoder", _lEncoder);
     	//SmartDashboard.putData("drive-right-encoder", _rEncoder);
-    	SmartDashboard.putNumber("drive-left-ticks", _lEncoder.get());
-    	SmartDashboard.putNumber("drive-right-ticks", _rEncoder.get());
-    	SmartDashboard.putNumber("drive-left-distance", _lEncoder.getDistance());
-    	SmartDashboard.putNumber("drive-right-distance", _rEncoder.getDistance());
+    	//SmartDashboard.putNumber("drive-left-ticks", _lEncoder.get());
+    	//SmartDashboard.putNumber("drive-right-ticks", _rEncoder.get());
+    	SmartDashboard.putNumber("drive-left-distance", this.getLeftEncoderDistance());
+    	SmartDashboard.putNumber("drive-right-distance", this.getRightEncoderDistance());
     }
     
 }

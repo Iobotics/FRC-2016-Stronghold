@@ -9,16 +9,12 @@ package org.iolani.frc;
 public class RobotMap {
 	
     // drive //
-    public static final int driveLeftMain      = 1;
+    public static final int driveLeftMain      = 3;
     public static final int driveLeftSlave1    = 2;
-    public static final int driveLeftSlave2    = 3;
-    public static final int driveRightMain     = 4;
+    public static final int driveLeftSlave2    = 1;
+    public static final int driveRightMain     = 6;
     public static final int driveRightSlave1   = 5;
-    public static final int driveRightSlave2   = 6;
-    public static final int driveLeftEncoderA  = 3;
-    public static final int driveLeftEncoderB  = 4;
-    public static final int driveRightEncoderA = 5;
-    public static final int driveRightEncoderB = 6;
+    public static final int driveRightSlave2   = 4;
     
     // intake //
     public static final int intakeTalon = 9;
