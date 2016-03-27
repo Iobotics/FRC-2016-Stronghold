@@ -23,27 +23,27 @@ public class ShooterWheels extends Subsystem {
     	_left = new CANTalon(RobotMap.shooterWheelLeft);
     	_left.enableBrakeMode(false);
     	_left.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
-    	_left.reverseSensor(false);
     	
     	_left.configNominalOutputVoltage(+0.0f, -0.0f);
     	_left.configPeakOutputVoltage(+12.0f, -12.0f);
     	_left.setProfile(1);
-    	_left.setF(0.0247);
-    	_left.setP(0.0682);
+    	_left.setF(0.024);
+    	_left.setP(0.05);
     	_left.setI(0);
-    	_left.setD(0);
+    	_left.setD(5);
     	
     	_right = new CANTalon(RobotMap.shooterWheelRight);
     	_right.enableBrakeMode(false);
     	_right.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+    	_right.reverseSensor(true);
     	
     	_right.configNominalOutputVoltage(+0.0f, -0.0f);
     	_right.configPeakOutputVoltage(+12.0f, -12.0f);
     	_right.setProfile(1);
-    	_right.setF(0.0258);
-    	_right.setP(0.0568);
+    	_right.setF(0.023);
+    	_right.setP(0.05);
     	_right.setI(0);
-    	_right.setD(0);
+    	_right.setD(5);
     }
     
     // positive is out //
