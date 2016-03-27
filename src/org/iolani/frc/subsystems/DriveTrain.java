@@ -183,12 +183,7 @@ public class DriveTrain extends Subsystem {
     }
     
     public void debug() {
-    	//SmartDashboard.putData("drive-left-encoder", _lEncoder);
-    	//SmartDashboard.putData("drive-right-encoder", _rEncoder);
-    	//SmartDashboard.putNumber("drive-left-ticks", _lEncoder.get());
-    	//SmartDashboard.putNumber("drive-right-ticks", _rEncoder.get());
     	SmartDashboard.putNumber("drive-left-distance", this.getLeftEncoderDistance());
     	SmartDashboard.putNumber("drive-right-distance", this.getRightEncoderDistance());
-    }
-    
+    }    
 }
