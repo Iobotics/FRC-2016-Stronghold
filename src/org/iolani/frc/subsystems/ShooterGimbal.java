@@ -71,13 +71,6 @@ public class ShooterGimbal extends Subsystem {
     	_azimuth.configNominalOutputVoltage(+0.0f, -0.0f);
     	_azimuth.configPeakOutputVoltage(+12.0f, -12.0f);
     	
-    	// velocity profile //
-    	_azimuth.setProfile(0);
-    	_azimuth.setF(0.1);
-    	_azimuth.setP(0);
-    	_azimuth.setI(0);
-    	_azimuth.setD(0);
-    	
     	// position profile //
     	_azimuth.setProfile(1);
     	_azimuth.setF(0);
@@ -99,13 +92,6 @@ public class ShooterGimbal extends Subsystem {
     	
     	_elevation.configNominalOutputVoltage(+0.0f, -0.0f);
     	_elevation.configPeakOutputVoltage(+12.0f, -12.0f);
-    	
-    	// velocity profile //
-    	_elevation.setProfile(0);
-    	_elevation.setF(0.1);
-    	_elevation.setP(0);
-    	_elevation.setI(0);
-    	_elevation.setD(0);
     	
     	// position profile //
     	_elevation.setProfile(1);
@@ -154,13 +140,6 @@ public class ShooterGimbal extends Subsystem {
     	return this.getAzimuthDegrees() - this.getAzimuthSetpointDegrees();
     }
     
-    public void setAzimuthSpeed(double degreesPerSecond) {
-    	_azimuth.setProfile(0);
-    	_azimuth.changeControlMode(TalonControlMode.Speed);
-    	_azimuth.set(degreesPerSecond / AZIMUTH_DEGREES_PER_REV * 60);
-    	_azimuthSetpoint = 0;
-    }
-    
     public double getElevationDegrees() {
     	return -_elevation.getPosition() * ELEVATION_DEGREES_PER_REV;
     }
@@ -195,13 +174,6 @@ public class ShooterGimbal extends Subsystem {
     	    	_elevation.setReverseSoftLimit(-ELEVATION_SHOT_DEGREES_MAX / ELEVATION_DEGREES_PER_REV);
     			break;
     	}
-    }
-    
-    public void setElevationSpeed(double degreesPerSecond) {
-    	_elevation.setProfile(1);
-    	_elevation.changeControlMode(TalonControlMode.Speed);
-    	_elevation.set(degreesPerSecond / ELEVATION_DEGREES_PER_REV * 60);
-    	_elevationSetpoint = 0;
     }
     
     // positive is clockwise //
