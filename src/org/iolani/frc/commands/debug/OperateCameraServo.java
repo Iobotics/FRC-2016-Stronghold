@@ -6,9 +6,6 @@ package org.iolani.frc.commands.debug;
 
 import org.iolani.frc.commands.CommandBase;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 /**
  *
  * @author iobotics
