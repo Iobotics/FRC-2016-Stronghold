@@ -4,7 +4,10 @@ import org.iolani.frc.RobotMap;
 import org.iolani.frc.commands.*;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
+import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Solenoid;
 
 /**
@@ -24,12 +27,22 @@ public class Intake extends Subsystem {
     public void init() {
     	_intake = new CANTalon(RobotMap.intakeTalon);
     	_intake.enableBrakeMode(true);
+    	_intake.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
+    	
+    	// PID control parameters //
+    	_intake.setProfile(1);
+    	_intake.setF(0);
+    	_intake.setP(1);
+    	_intake.setI(0);
+    	_intake.setD(0);
+    	
     	_valve = new Solenoid(RobotMap.intakeValve);
     	this.setRampPosition(RampPosition.Retracted);
     }
     
     // positive is in //
     public void setPower(double power) {
+    	_intake.changeControlMode(TalonControlMode.PercentVbus);
     	_intake.set(power);
     }
 
@@ -44,8 +57,21 @@ public class Intake extends Subsystem {
     	return _valve.get()? RampPosition.Deployed: RampPosition.Retracted;
     }
     
+    public double getIntakePositionDegrees() {
+    	return _intake.getPosition();
+    }
+    
+    public void setIntakePositionDegrees(double angle) {
+    	_intake.changeControlMode(TalonControlMode.Position);
+    	_intake.setSetpoint(angle);
+    }
+    
     public void initDefaultCommand() {
     	this.setDefaultCommand(new SetIntakePower(0.0, RampPosition.Retracted));
+    }
+    
+    public void debug() {
+    	SmartDashboard.putNumber("intake-position", this.getIntakePositionDegrees());
     }
 }
 

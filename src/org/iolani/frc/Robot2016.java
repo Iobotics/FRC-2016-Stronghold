@@ -114,6 +114,7 @@ public class Robot2016 extends IterativeRobot {
         Scheduler.getInstance().run();
         
         SmartDashboard.putData(Scheduler.getInstance());
+        CommandBase.intake.debug();
         CommandBase.shooterWheels.debug();
         CommandBase.shooterGimbal.debug();
         CommandBase.drivetrain.debug();
