@@ -31,7 +31,7 @@ public class Camera extends Subsystem {
 	private Servo _servo;
 	
     public void init() {
-    	_servo = new Servo(RobotMap.cameraPWM);
+    	_servo = new Servo(RobotMap.cameraServoPWM);
     	//this.sendCommand(CameraCommand.Start);
     }
        

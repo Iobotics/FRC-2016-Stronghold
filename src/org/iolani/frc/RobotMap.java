@@ -25,12 +25,15 @@ public class RobotMap {
     public static final int intakeValve = 7;
     
     // shooter //
-    public static final int shooterAzimuth    = 7;
-    public static final int shooterElevation  = 10;
-    public static final int shooterWheelLeft  = 11;
-    public static final int shooterWheelRight = 12;
-    public static final int shooterKickValve  = 0;
+    public static final int shooterAzimuth      = 10;
+    public static final int shooterElevation    = 7;
+    public static final int shooterWheelLeft    = 12;
+    public static final int shooterWheelRight   = 11;
+    public static final int shooterKickValve    = 0;
+    public static final int shooterAzimuthADC   = 0;
+    public static final int shooterElevationADC = 1;
+    public static final int shooterDebugDIO     = 9;
     
     // camera //
-    public static final int cameraPWM = 0;
+    public static final int cameraServoPWM = 0;
 }

@@ -46,19 +46,20 @@ public class ShooterWheels extends Subsystem {
     	_right.setD(0);
     }
     
-    // positive is in //
+    // positive is out //
     public void setPower(double power) {
     	_left.changeControlMode(TalonControlMode.PercentVbus);    	
     	_left.set(-power);
     	_right.changeControlMode(TalonControlMode.PercentVbus);
-    	_right.set(power);
+    	_right.set(-power);
     }
 
+    // positive is out //
     public void setSpeed(double rpm) {
     	_left.changeControlMode(TalonControlMode.Speed);
     	_left.set(-rpm);
     	_right.changeControlMode(TalonControlMode.Speed);
-    	_right.set(rpm);
+    	_right.set(-rpm);
     }
     
     public void initDefaultCommand() {
@@ -68,7 +69,7 @@ public class ShooterWheels extends Subsystem {
     public void debug() {
      	SmartDashboard.putNumber("shooter-left-rpm", -(int) _left.getSpeed());
      	//SmartDashboard.putNumber("shooter-left-error", _left.getClosedLoopError());
-    	SmartDashboard.putNumber("shooter-right-rpm", (int) _right.getSpeed());
+    	SmartDashboard.putNumber("shooter-right-rpm", -(int) _right.getSpeed());
     	//SmartDashboard.putNumber("shooter-right-error", _right.getClosedLoopError());
     }
 }

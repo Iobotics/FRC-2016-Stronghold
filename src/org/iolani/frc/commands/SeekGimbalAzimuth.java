@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class SeekGimbalAzimuth extends CommandBase {
 	
 	private static final double ERROR_DEGREES = 0.5;
-	private static final double CONVERGE_TIME = 1.0;
+	private static final double CONVERGE_TIME = 0;
 	private final double _azimuth;
 	
 	private enum State {

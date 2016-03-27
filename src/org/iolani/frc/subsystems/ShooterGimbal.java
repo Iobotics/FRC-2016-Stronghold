@@ -2,12 +2,16 @@ package org.iolani.frc.subsystems;
 
 import org.iolani.frc.RobotMap;
 import org.iolani.frc.commands.*;
+import org.iolani.frc.commands.debug.OperateGimbalUnsafe;
+import org.iolani.frc.commands.debug.TuneGimbalPID;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+import edu.wpi.first.wpilibj.DigitalOutput;
 
 /**
  *
@@ -18,6 +22,11 @@ public class ShooterGimbal extends Subsystem {
 	private CANTalon _azimuth;
 	private CANTalon _elevation;
 	
+	public AnalogPotentiometer _azimuthPot;
+	public AnalogPotentiometer _elevationPot;
+	
+	public DigitalOutput _debugDO;
+	
 	private double _azimuthSetpoint;
 	private double _elevationSetpoint;
 	
@@ -27,20 +36,28 @@ public class ShooterGimbal extends Subsystem {
 	}
 	
 	// physical constants //
+	private static final double POT_TURNS = 10;
+	
 	private static final double AZIMUTH_PINION_TEETH    = 12;
 	private static final double AZIMUTH_GEAR_TEETH      = 120;
 	private static final double AZIMUTH_DEGREES_PER_REV = (AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH) * 360;
 	private static final double AZIMUTH_DEGREES_MIN     = -36;
 	private static final double AZIMUTH_DEGREES_MAX     = 36;
+	private static final double AZIMUTH_POT_FULL_SCALE  = (POT_TURNS * 360) * AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH;
 	
 	private static final double ELEVATION_PINION_TEETH    = 14;
 	private static final double ELEVATION_GEAR_TEETH      = 160;
 	private static final double ELEVATION_DEGREES_PER_REV = (ELEVATION_PINION_TEETH / ELEVATION_GEAR_TEETH) * 360;
 	private static final double ELEVATION_DEGREES_MIN     = 0;
 	private static final double ELEVATION_DEGREES_MAX     = 97;
+	private static final double ELEVATION_POT_FULL_SCALE  = (POT_TURNS * 360) * ELEVATION_PINION_TEETH / ELEVATION_GEAR_TEETH;
 	
 	private static final double ELEVATION_SHOT_DEGREES_MIN = 30;
 	private static final double ELEVATION_SHOT_DEGREES_MAX = 60;
+	
+	// calibration constants //
+	private static final double AZIMUTH_OFFSET_DEGREES   = -285.0;
+	private static final double ELEVATION_OFFSET_DEGREES = -150.7;
 	
     public void init() {
     	_azimuth = new CANTalon(RobotMap.shooterAzimuth);
@@ -65,9 +82,12 @@ public class ShooterGimbal extends Subsystem {
     	// position profile //
     	_azimuth.setProfile(1);
     	_azimuth.setF(0);
-    	_azimuth.setP(6);
-    	_azimuth.setI(0.015);
-    	_azimuth.setD(400);
+    	_azimuth.setP(5);
+    	_azimuth.setI(0);
+    	_azimuth.setD(240);
+    	
+    	// azimuth pot //
+    	_azimuthPot = new AnalogPotentiometer(RobotMap.shooterAzimuthADC, AZIMUTH_POT_FULL_SCALE, AZIMUTH_OFFSET_DEGREES);
     	
     	// note: elevation is inverted //
     	_elevation = new CANTalon(RobotMap.shooterElevation);
@@ -91,10 +111,18 @@ public class ShooterGimbal extends Subsystem {
     	// position profile //
     	_elevation.setProfile(1);
     	_elevation.setF(0);
-    	_elevation.setP(8);
-    	_elevation.setI(0.01);
-    	_elevation.setD(400);
+    	_elevation.setP(12);
+    	_elevation.setI(0);
+    	_elevation.setD(240);
     	
+    	// elevation pot //
+    	_elevationPot = new AnalogPotentiometer(RobotMap.shooterElevationADC, ELEVATION_POT_FULL_SCALE, ELEVATION_OFFSET_DEGREES);
+    	
+    	// debug DIO: used for scope trigger during step response tuning //
+    	_debugDO = new DigitalOutput(RobotMap.shooterDebugDIO);
+    	_debugDO.set(false);
+    	
+    	// clear setpoints //
     	_azimuthSetpoint   = 0;
     	_elevationSetpoint = 0;
     }
@@ -108,6 +136,10 @@ public class ShooterGimbal extends Subsystem {
     	return _azimuth.getPosition() * AZIMUTH_DEGREES_PER_REV;
     }
  
+    public double getAzimuthPotDegrees() {
+    	return -_azimuthPot.get();
+    }
+    
     public double getAzimuthSetpointDegrees() {
     	return _azimuthSetpoint;
     }
@@ -132,6 +164,10 @@ public class ShooterGimbal extends Subsystem {
     
     public double getElevationDegrees() {
     	return -_elevation.getPosition() * ELEVATION_DEGREES_PER_REV;
+    }
+    
+    public double getElevationPotDegrees() {
+    	return -_elevationPot.get();
     }
     
     public double getElevationSetpointDegrees() {
@@ -183,15 +219,21 @@ public class ShooterGimbal extends Subsystem {
     	_elevation.set(-power);
     }
     
+    public void setDebugOutput(boolean value) {
+    	_debugDO.set(value);
+    }
+    
     public void initDefaultCommand() {
-    	//this.setDefaultCommand(new SetShooterGimbalPower(0.0, 0.0));
+    	//this.setDefaultCommand(new TuneGimbalPID());
     	//this.setDefaultCommand(new OperateGimbalUnsafe());
     	this.setDefaultCommand(new HoldGimbalPosition());
     }
     
     public void debug() {
      	SmartDashboard.putNumber("gimbal-azimuth-position", this.getAzimuthDegrees());
+     	SmartDashboard.putNumber("gimbal-azimuth-pot", this.getAzimuthPotDegrees());
     	SmartDashboard.putNumber("gimbal-elevation-position", this.getElevationDegrees());
+    	SmartDashboard.putNumber("gimbal-elevation-pot", this.getElevationPotDegrees());
     }
 }
 

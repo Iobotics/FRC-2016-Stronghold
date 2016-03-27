@@ -31,7 +31,7 @@ public class OperateGimbalSlow extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        double azimuth   = oi.getGunnerStick().getX(Hand.kLeft);
+        double azimuth   = oi.getGunnerStick().getX(Hand.kLeft) * 2;
         double elevation = oi.getGunnerStick().getY(Hand.kLeft);
         
         //shooterGimbal.setAzimuthSpeed(azimuth * SPEED_DEG_PER_SEC);
