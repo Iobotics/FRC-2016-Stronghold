@@ -19,6 +19,11 @@ public class OperateGimbalFast extends CommandBase {
             new PowerScaler.PowerPoint(1.0, 0.4)
         });*/
 	
+	private static final double DEADBAND = 0.1;
+	
+	private boolean _azimuthLocked;
+	private boolean _elevationLocked; 
+	
     public OperateGimbalFast() {
         requires(shooterGimbal);
     }
@@ -26,25 +31,36 @@ public class OperateGimbalFast extends CommandBase {
     // Called just before this Command runs the first time
     protected void initialize() {
     	shooterGimbal.setElevationEnvelope(ElevationEnvelope.Shot);
+    	_azimuthLocked = true;
+    	shooterGimbal.setAzimuthSetpointDegrees(shooterGimbal.getAzimuthDegrees());
+    	_elevationLocked = true;
+    	shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees());
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        double azimuth   = oi.getGunnerStick().getX();
+    	// azimuth control //
+        double azimuth = oi.getGunnerStick().getX();
+        if(Math.abs(azimuth) > DEADBAND) {
+        	azimuth *= 0.3;
+        	shooterGimbal.setAzimuthPower(azimuth);
+        	_azimuthLocked = false;
+        } else if(!_azimuthLocked){
+        	// hold position //
+        	shooterGimbal.setAzimuthSetpointDegrees(shooterGimbal.getAzimuthDegrees());
+        	_azimuthLocked = true;
+        }
+        
+        // elevation control //
         double elevation = oi.getGunnerStick().getY();
-        
-        // signal conditioning //
-        //azimuth   = _scaler.get(azimuth);
-        azimuth *= 0.3;
-        //elevation = _scaler.get(elevation);
-        elevation *= 0.3;
-        
-        //System.out.println("gimbal: " + azimuth + ", " + elevation);
-        shooterGimbal.setAzimuthPower(azimuth);
-        shooterGimbal.setElevationPower(elevation);
-        
-        if(oi.getGunnerStick().getRawButton(1)) {
-        	shooterGimbal.resetEncoders();
+        if(Math.abs(elevation) > DEADBAND) {
+        	elevation *= 0.3;
+        	shooterGimbal.setElevationPower(elevation);
+        	_elevationLocked = false;
+        } else if(!_elevationLocked){
+        	// hold position //
+        	shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees());
+        	_elevationLocked = true;
         }
     }
 
