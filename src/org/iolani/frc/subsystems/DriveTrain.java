@@ -178,8 +178,16 @@ public class DriveTrain extends Subsystem {
     	return _left.getPosition() * ENCODER_INCHES_PER_REV;
     }
     
+    public void setLeftEncoderDistance(double value) {
+    	_left.setPosition(value / ENCODER_INCHES_PER_REV);
+    }
+    
     public double getRightEncoderDistance() {
     	return _right.getPosition() * ENCODER_INCHES_PER_REV;
+    }
+    
+    public void setRightEncoderDistance(double value) {
+    	_right.setPosition(value / ENCODER_INCHES_PER_REV);
     }
     
     public void debug() {

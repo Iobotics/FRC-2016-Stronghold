@@ -12,6 +12,7 @@ import org.iolani.frc.util.PowerScaler;
 import org.iolani.frc.commands.*;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
 import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
+import org.iolani.frc.commands.auto.AutoDriveStraight;
 import org.iolani.frc.commands.debug.RunCameraCommand;
 import org.iolani.frc.subsystems.Camera.CameraCommand;
 //import org.iolani.frc.commands.auto.AutoDriveStraight;
@@ -64,9 +65,9 @@ public class OI {
     private final Button _gunnerDriveButton  = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 1));
     private final Button _gunnerVisionButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 2));
     
-    // debug buttons //
-    private final Button _cameraStartButton = new JoystickButton(_lStick, 9);
-    private final Button _cameraStopButton = new JoystickButton(_lStick, 8);
+    
+    // auto test buttons //
+    private final Button _autoTestButton1  = new JoystickButton(_rStick, 8);
     
     /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
     private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
@@ -77,12 +78,6 @@ public class OI {
     
     private final JoystickButton _shooterOutButton3 = new JoystickButton(_lStick, 11);
     private final JoystickButton _shooterInButton3  = new JoystickButton(_lStick, 10);
-    
-    private final JoystickButton _gimbalPositionButton = new JoystickButton(_xStick, 2);
-    private final JoystickButton _gimbalPositionButton2 = new JoystickButton(_xStick, 3);
-    private final JoystickButton _gimbalPositionButton3 = new JoystickButton(_xStick, 5);
-    private final JoystickButton _gimbalPositionButton4 = new JoystickButton(_xStick, 6);
-    private final JoystickButton _gimbalPositionButton5 = new JoystickButton(_xStick, 4);
     */
     
     private final PowerScaler _scaler;
@@ -119,17 +114,14 @@ public class OI {
         _gunnerDriveButton.whileHeld(new OperateGunnerDrive());
         _gunnerVisionButton.whileHeld(new SeekGimbalToVision());
         
-        // debugging (not currently working) //
-        _cameraStartButton.whenPressed(new RunCameraCommand(CameraCommand.Start));
-        _cameraStopButton.whenPressed(new RunCameraCommand(CameraCommand.Stop));
         
         /*
         _navCalibrateButton.whenPressed(new CalibrateNavigationSensor());
-        
+        */
         _autoTestButton1.whenPressed(new AutoDriveStraight(36));
-        _autoTestButton2.whenPressed(new AutoDriveStraight(120));
-        _autoTestButton3.whenPressed(new AutoTurn(90));
-        _autoTestButton4.whenPressed(new AutoGrabTrashCan());*/
+        //_autoTestButton2.whenPressed(new AutoDriveStraight(120));
+        //_autoTestButton3.whenPressed(new AutoTurn(90));
+        //_autoTestButton4.whenPressed(new AutoGrabTrashCan());
     }
     
     public Joystick getLeftStick()  {

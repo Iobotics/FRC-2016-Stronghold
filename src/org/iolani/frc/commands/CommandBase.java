@@ -6,6 +6,7 @@ import org.iolani.frc.OI;
 import org.iolani.frc.subsystems.Camera;
 import org.iolani.frc.subsystems.DriveTrain;
 import org.iolani.frc.subsystems.Intake;
+import org.iolani.frc.subsystems.NavigationSensor;
 import org.iolani.frc.subsystems.ShooterGimbal;
 //import org.iolani.frc.subsystems.Elevator;
 //import org.iolani.frc.subsystems.NavigationSensor;
@@ -28,10 +29,7 @@ public abstract class CommandBase extends Command {
     public static final ShooterWheels shooterWheels = new ShooterWheels();
     public static final ShooterGimbal shooterGimbal = new ShooterGimbal();
     public static final Camera        camera        = new Camera();
-    
-//    public static final Elevator elevator = new Elevator();
-//    public static final NavigationSensor navsensor = new NavigationSensor();
-//    public static final Grabber grabber = new Grabber();
+    public static final NavigationSensor navsensor = new NavigationSensor();
 
     public static void init() {
         // This MUST be here. If the OI creates Commands (which it very likely
@@ -42,7 +40,7 @@ public abstract class CommandBase extends Command {
         oi = new OI();
 
         // Show what command your subsystem is running on the SmartDashboard
- //       navsensor.init();
+        navsensor.init();
         drivetrain.init();
         intake.init();
         shooterKicker.init();

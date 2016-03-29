@@ -121,7 +121,7 @@ public class Robot2016 extends IterativeRobot {
         SmartDashboard.putBoolean("home-mode", CommandBase.oi.getHomeStateEnabled());
         SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
         CommandBase.camera.debug();
-//        CommandBase.navsensor.debug();
+        CommandBase.navsensor.debug();
     }
     
     /**
