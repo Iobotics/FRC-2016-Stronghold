@@ -6,6 +6,9 @@ package org.iolani.frc.subsystems;
 //import java.io.PrintWriter;
 
 import org.iolani.frc.RobotMap;
+//import org.iolani.frc.commands.SetCameraPosition;
+//import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
+//import org.iolani.frc.commands.debug.OperateCameraServo;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -24,7 +27,6 @@ public class Camera extends Subsystem {
 		Restart
 	}
 	
-
 	public static final double SERVO_MIN = 0.234;
 	public static final double SERVO_MAX = 0.525;
 	
@@ -43,6 +45,10 @@ public class Camera extends Subsystem {
     // 0 is fully down, 1 is fully up //
     public void setServoPosition(double position) {
     	double value = SERVO_MIN + position * (SERVO_MAX - SERVO_MIN);
+    	_servo.set(value);
+    }
+    
+    public void setServoRaw(double value) {
     	_servo.set(value);
     }
     
@@ -83,10 +89,12 @@ public class Camera extends Subsystem {
     
     public void initDefaultCommand() {
     	//this.setDefaultCommand(new SetCameraPosition(CameraPosition.Stowed));
+    	//this.setDefaultCommand(new OperateCameraServo());
     }
     
     public void debug() {
     	SmartDashboard.putNumber("camera-servo", this.getServoPosition());
+    	//SmartDashboard.putNumber("camera-servo", _servo.get());
     }
 }
 
