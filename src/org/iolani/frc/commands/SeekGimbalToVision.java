@@ -18,12 +18,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class SeekGimbalToVision extends PIDCommand {
    
 	//private static final double SPEED_DEG_PER_SEC = 5;
-	private static final double K_P = 3;
+	private static final double K_P = 2;
 	private static final double K_I = 0;
-	private static final double K_D = 10;
+	private static final double K_D = 0;
 	
 	//private static final double MAX_POWER = 0.15;
-	private static final double MAX_OFFSET = 10;
+	private static final double MAX_OFFSET = 20;
 	
 	private final NetworkTable _table;
 	
@@ -37,6 +37,7 @@ public class SeekGimbalToVision extends PIDCommand {
     // Called just before this Command runs the first time
     protected void initialize() {
     	CommandBase.shooterGimbal.setElevationEnvelope(ElevationEnvelope.Shot);
+    	CommandBase.shooterGimbal.setElevationSetpointDegrees(CommandBase.shooterGimbal.getElevationDegrees());
     	this.setSetpoint(0.0); // home to zero //
     }
 
