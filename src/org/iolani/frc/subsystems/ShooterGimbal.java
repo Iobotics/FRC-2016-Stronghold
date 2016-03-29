@@ -34,25 +34,27 @@ public class ShooterGimbal extends Subsystem {
 		Shot
 	}
 	
+	// limits //
+	public static final double AZIMUTH_DEGREES_MIN        = -36;
+	public static final double AZIMUTH_DEGREES_MAX        = 36;
+	public static final double ELEVATION_DEGREES_MIN      = 0;
+	public static final double ELEVATION_DEGREES_MAX      = 97;
+	public static final double ELEVATION_SHOT_DEGREES_MIN = 30;
+	public static final double ELEVATION_SHOT_DEGREES_MAX = 60;
+	
 	// physical constants //
 	private static final double POT_TURNS = 10;
 	
 	private static final double AZIMUTH_PINION_TEETH    = 12;
 	private static final double AZIMUTH_GEAR_TEETH      = 120;
 	private static final double AZIMUTH_DEGREES_PER_REV = (AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH) * 360;
-	private static final double AZIMUTH_DEGREES_MIN     = -36;
-	private static final double AZIMUTH_DEGREES_MAX     = 36;
 	private static final double AZIMUTH_POT_FULL_SCALE  = (POT_TURNS * 360) * AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH;
 	
 	private static final double ELEVATION_PINION_TEETH    = 14;
 	private static final double ELEVATION_GEAR_TEETH      = 160;
 	private static final double ELEVATION_DEGREES_PER_REV = (ELEVATION_PINION_TEETH / ELEVATION_GEAR_TEETH) * 360;
-	private static final double ELEVATION_DEGREES_MIN     = 0;
-	private static final double ELEVATION_DEGREES_MAX     = 97;
 	private static final double ELEVATION_POT_FULL_SCALE  = (POT_TURNS * 360) * ELEVATION_PINION_TEETH / ELEVATION_GEAR_TEETH;
 	
-	private static final double ELEVATION_SHOT_DEGREES_MIN = 30;
-	private static final double ELEVATION_SHOT_DEGREES_MAX = 60;
 	
 	// calibration constants //
 	private static final double AZIMUTH_OFFSET_DEGREES   = -285.0;
