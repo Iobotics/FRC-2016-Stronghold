@@ -59,8 +59,7 @@ public class Robot2016 extends IterativeRobot {
 		//_autoCommand = new AutoDriveOnly();
         
     	CommandBase.init();
-//		new HomeElevator().start();
-//		new CalibrateNavigationSensor().start();
+		new CalibrateNavigationSensor().start();
     }
 	
 	public void disabledPeriodic() {
@@ -113,15 +112,15 @@ public class Robot2016 extends IterativeRobot {
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
         
-        SmartDashboard.putData(Scheduler.getInstance());
         CommandBase.intake.debug();
         CommandBase.shooterWheels.debug();
         CommandBase.shooterGimbal.debug();
         CommandBase.drivetrain.debug();
-        SmartDashboard.putBoolean("home-mode", CommandBase.oi.getHomeStateEnabled());
-        SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
         CommandBase.camera.debug();
         CommandBase.navsensor.debug();
+        
+        SmartDashboard.putBoolean("home-mode",   CommandBase.oi.getHomeStateEnabled());
+        SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
     }
     
     /**
