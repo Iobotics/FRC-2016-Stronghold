@@ -43,13 +43,14 @@ public class OI {
     private final Button _outakeButton = new JoystickButton(_lStick, 1);
     
     private final Button _ballOperateButton = new JoystickButton(_lStick, 2);
-    private final Button _cameraSpyButton   = new ConditionalButton(_homeModeState, new JoystickButton(_lStick, 5));
+  
     
     private final Button _homePositionButton  = new JoystickButton(_rStick, 3);
     private final Button _loadPositionButton  = new JoystickButton(_lStick, 3);
-    private final Button _clearPositionButton = new JoystickButton(_rStick, 4);
     
-    private final Button _gunnerEnableButton = new JoystickButton(_rStick, 2);
+    private final Button _gunnerLowButton  = new JoystickButton(_rStick, 4);
+    private final Button _gunnerMidButton  = new JoystickButton(_rStick, 2);
+    private final Button _gunnerHighButton = new JoystickButton(_rStick, 5);
     
     // gunner buttons //
     private final Button _gunnerFastButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 3));
@@ -80,29 +81,20 @@ public class OI {
     private final JoystickButton _shooterInButton3  = new JoystickButton(_lStick, 10);
     */
     
-    private final PowerScaler _scaler;
-    
     public OI() {
-        
-        // use power scaling from traction mode on 2014 bot //
-        _scaler = new PowerScaler(new PowerScaler.PowerPoint[] {
-                new PowerScaler.PowerPoint(0.0, 0.0),
-                new PowerScaler.PowerPoint(0.05, 0.0),
-                new PowerScaler.PowerPoint(0.75, 0.5),
-                new PowerScaler.PowerPoint(0.90, 1.0)
-            });
         
         _intakeButton.whileHeld(new IntakeBall());
         _outakeButton.whileHeld(new OutakeBall());
         
         _homePositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Home));
         _loadPositionButton.whenPressed(new LoadBall());
-        _clearPositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Clearance));
         
         // broken for now //
         //_cameraSpyButton.whileHeld(new SetCameraPosition(CameraPosition.IntakeSight));
         
-        _gunnerEnableButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerNeutral));
+        _gunnerLowButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerLow));
+        _gunnerMidButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerMiddle));
+        _gunnerHighButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerHigh));
         
         _gunnerFastButton.whileHeld(new OperateGimbalFast());
         _gunnerSlowButton.whileHeld(new OperateGimbalSlow());
@@ -154,10 +146,6 @@ public class OI {
     
     public Joystick getGunnerStick() {
     	return _xStick;
-    }
-    
-    public PowerScaler getPowerScaler() {
-        return _scaler;
     }
         
     /*public Button getIntakeLeftButton() {

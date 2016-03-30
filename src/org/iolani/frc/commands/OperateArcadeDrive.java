@@ -12,6 +12,14 @@ import org.iolani.frc.util.PowerScaler;
  */
 public class OperateArcadeDrive extends CommandBase {
     
+	private static final PowerScaler _scaler = new PowerScaler(
+		new PowerScaler.PowerPoint[] {
+            new PowerScaler.PowerPoint(0.0, 0.0),
+            new PowerScaler.PowerPoint(0.05, 0.0),
+            new PowerScaler.PowerPoint(0.75, 0.5),
+            new PowerScaler.PowerPoint(0.90, 1.0)
+        });
+	
     public OperateArcadeDrive() {
         requires(drivetrain);
     }
@@ -26,7 +34,7 @@ public class OperateArcadeDrive extends CommandBase {
         double rot = oi.getLeftStick().getX();
         
         // signal conditioning //
-        PowerScaler driveScale = oi.getPowerScaler();
+        PowerScaler driveScale = _scaler;
         if(driveScale != null) {
             mag = driveScale.get(mag);
             rot *= Math.abs(rot); // rot^2 preserving sign //

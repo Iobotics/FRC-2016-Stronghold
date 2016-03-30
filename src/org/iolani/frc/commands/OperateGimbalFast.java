@@ -23,6 +23,7 @@ public class OperateGimbalFast extends CommandBase {
 	
 	private boolean _azimuthLocked;
 	private boolean _elevationLocked; 
+	private int     _lastPOV;
 	
     public OperateGimbalFast() {
         requires(shooterGimbal);
@@ -39,28 +40,48 @@ public class OperateGimbalFast extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	// azimuth control //
-        double azimuth = oi.getGunnerStick().getX();
-        if(Math.abs(azimuth) > DEADBAND) {
-        	azimuth *= 0.3;
-        	shooterGimbal.setAzimuthPower(azimuth);
-        	_azimuthLocked = false;
-        } else if(!_azimuthLocked){
-        	// hold position //
-        	shooterGimbal.setAzimuthSetpointDegrees(shooterGimbal.getAzimuthDegrees());
-        	_azimuthLocked = true;
-        }
-        
-        // elevation control //
-        double elevation = oi.getGunnerStick().getY();
-        if(Math.abs(elevation) > DEADBAND) {
-        	elevation *= 0.3;
-        	shooterGimbal.setElevationPower(elevation);
-        	_elevationLocked = false;
-        } else if(!_elevationLocked){
-        	// hold position //
-        	shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees());
-        	_elevationLocked = true;
+    	
+    	int pov = oi.getGunnerStick().getPOV(); 
+        if(pov != _lastPOV) {
+        	switch(pov) {
+        		case 0: // 
+        			shooterGimbal.setElevationSetpointDegrees(39);
+        			break;
+        		case 90:
+        			shooterGimbal.setElevationSetpointDegrees(42);
+        			break;
+        		case 180:
+        			shooterGimbal.setElevationSetpointDegrees(45);
+        			break;
+        		case 270:
+        			shooterGimbal.setElevationSetpointDegrees(52);
+        			break;
+        	}
+        	_lastPOV = pov;
+        } else {
+        	// azimuth control //
+            double azimuth = oi.getGunnerStick().getX();
+            if(Math.abs(azimuth) > DEADBAND) {
+            	azimuth *= 0.3;
+            	shooterGimbal.setAzimuthPower(azimuth);
+            	_azimuthLocked = false;
+            } else if(!_azimuthLocked){
+            	// hold position //
+            	shooterGimbal.setAzimuthSetpointDegrees(shooterGimbal.getAzimuthDegrees());
+            	_azimuthLocked = true;
+            }
+            
+            // elevation control //
+            double elevation = oi.getGunnerStick().getY();
+            if(Math.abs(elevation) > DEADBAND) {
+            	elevation *= 0.3;
+            	shooterGimbal.setElevationPower(elevation);
+            	_elevationLocked = false;
+            } else if(!_elevationLocked){
+            	// hold position //
+            	shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees());
+            	_elevationLocked = true;
+            }
         }
     }
 

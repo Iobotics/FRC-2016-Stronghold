@@ -15,13 +15,17 @@ public class SeekGimbalToPosition extends CommandGroup {
 	private static final double HOME_ELEVATION_ANGLE      = 0.0;
 	private static final double LOAD_ELEVATION_ANGLE      = 96.0;
 	private static final double CLEARANCE_ELEVATION_ANGLE = 5.0;
-	private static final double SHOT_ELEVATION_ANGLE      = 45.0;
+	private static final double SHOT_LOW_ANGLE            = 42.0;
+	private static final double SHOT_MIDDLE_ANGLE         = 45.0;
+	private static final double SHOT_HIGH_ANGLE           = 52.0;
 	
 	public enum GimbalPosition {
 		Home,
 		SlotLoad,
 		Clearance,
-		GunnerNeutral
+		GunnerLow,
+		GunnerMiddle,
+		GunnerHigh
 	}
     
     public SeekGimbalToPosition(GimbalPosition pos) {
@@ -47,11 +51,18 @@ public class SeekGimbalToPosition extends CommandGroup {
     			this.addSequential(new SeekGimbalAzimuth(0.0));
     			this.addSequential(new SeekGimbalElevation(CLEARANCE_ELEVATION_ANGLE));
     			break;
-    		case GunnerNeutral:
+    		case GunnerLow:
+    		case GunnerMiddle:
+    		case GunnerHigh:
+    			double shotAngle = (
+    				(pos == GimbalPosition.GunnerLow)? SHOT_LOW_ANGLE:
+    				(pos == GimbalPosition.GunnerMiddle)? SHOT_MIDDLE_ANGLE:
+    				SHOT_HIGH_ANGLE
+    			  ); 
     			this.addParallel(new SetHomeStateEnabled(false));
     			this.addSequential(new SetCameraPosition(CameraPosition.ShotOptimal));
     			this.addSequential(new SeekGimbalAzimuth(0.0));
-    			this.addSequential(new SeekGimbalElevation(SHOT_ELEVATION_ANGLE));
+    			this.addSequential(new SeekGimbalElevation(shotAngle));
     			this.addSequential(new SetGunnerControlEnabled(true));
     			break;
     		default:

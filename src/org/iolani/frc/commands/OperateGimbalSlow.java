@@ -72,29 +72,6 @@ public class OperateGimbalSlow extends CommandBase {
         
         shooterGimbal.setAzimuthSetpointDegrees(_azimuthCurrent);
         shooterGimbal.setElevationSetpointDegrees(_elevationCurrent);
-        
-        /*double azimuth   = oi.getGunnerStick().getX() * 2;
-        double elevation = oi.getGunnerStick().getY();
-        
-        double deltaTime = (this.timeSinceInitialized() - _lastTime);
-        double deltaStep = SPEED_DEG_PER_SEC * deltaTime;
-        shooterGimbal.setAzimuthSetpointDegrees(shooterGimbal.getAzimuthDegrees() + azimuth * deltaStep);
-        shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees() + elevation * deltaStep);
-        
-        int pov = oi.getGunnerStick().getPOV(); 
-        if(pov != _lastPOV) {
-        	switch(pov) {
-        		case 0:
-        			shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees() - 1);
-        			break;
-        		case 180:
-        			shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees() + 1);
-        			break;
-        	}
-        	_lastPOV = pov;
-        }
-        _lastTime = this.timeSinceInitialized();*/
-    	
     }
 
     // Make this return true when this Command no longer needs to run execute()
