@@ -48,10 +48,10 @@ public class OperateGimbalFast extends CommandBase {
         			shooterGimbal.setElevationSetpointDegrees(39);
         			break;
         		case 90:
-        			shooterGimbal.setElevationSetpointDegrees(42);
+        			shooterGimbal.setElevationSetpointDegrees(45);
         			break;
         		case 180:
-        			shooterGimbal.setElevationSetpointDegrees(45);
+        			shooterGimbal.setElevationSetpointDegrees(42);
         			break;
         		case 270:
         			shooterGimbal.setElevationSetpointDegrees(52);
