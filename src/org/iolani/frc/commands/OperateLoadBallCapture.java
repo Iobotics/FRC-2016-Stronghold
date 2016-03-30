@@ -1,6 +1,7 @@
 package org.iolani.frc.commands;
 
 import org.iolani.frc.commands.CommandBase;
+import org.iolani.frc.subsystems.Intake.RampPosition;
 
 /**
  *  When in load mode, wait for a button press to pulse the shooter wheels to grab the ball.
@@ -8,10 +9,14 @@ import org.iolani.frc.commands.CommandBase;
 public class OperateLoadBallCapture extends CommandBase {
 
 	private static final double CAPTURE_TIME = 0.250;
+	private static final double SPINUP_TIME  = 0.5;
+	private static final double SHOOT_TIME   = 0.250;
 	
 	private enum State {
 		WaitForPress,
-		Capture
+		Capture,
+		SpinUpShooter,
+		FireBall
 	}
 	private State _state;
 	private double _waitTime;
@@ -33,6 +38,9 @@ public class OperateLoadBallCapture extends CommandBase {
     			if(oi.getBallOperateButton().get()) {
     				_waitTime = this.timeSinceInitialized() + CAPTURE_TIME;
     				_state = State.Capture;
+    			} else if(oi.getAuxOperateButton().get()) {
+    				_waitTime = this.timeSinceInitialized() + SPINUP_TIME;
+    				_state = State.SpinUpShooter;
     			}
     			break;
     		case Capture:
@@ -41,7 +49,27 @@ public class OperateLoadBallCapture extends CommandBase {
     				_state = State.WaitForPress;
     			}
     			break;
+    		case SpinUpShooter:
+    			shooterWheels.setPower(1.0);
+    			if(this.timeSinceInitialized() > _waitTime) {
+    				_waitTime = this.timeSinceInitialized() + SHOOT_TIME;
+    				_state = State.FireBall;
+    			}
+    			break;
+    		case FireBall:
+    			shooterKicker.setEnabled(true);
+    			if(this.timeSinceInitialized() > _waitTime) {
+    				shooterWheels.setPower(0);
+    				shooterKicker.setEnabled(false);
+    				_state = State.WaitForPress;
+    			}
+    			break;
     	}
+    	
+    	// emergency ball eject //
+    	boolean intakeOp = oi.getIntakeOperateButton().get();
+    	intake.setPower(intakeOp? -1: 0);
+    	intake.setRampPosition(intakeOp? RampPosition.Deployed: RampPosition.Retracted);
     }
 
     // run continuously waiting for input until interrupted //

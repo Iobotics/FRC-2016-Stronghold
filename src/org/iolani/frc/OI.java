@@ -42,8 +42,9 @@ public class OI {
     private final Button _intakeButton = new JoystickButton(_rStick, 1);
     private final Button _outakeButton = new JoystickButton(_lStick, 1);
     
-    private final Button _ballOperateButton = new JoystickButton(_lStick, 2);
-  
+    private final Button _ballOperateButton   = new JoystickButton(_lStick, 2);
+    private final Button _intakeOperateButton = new JoystickButton(_lStick, 5);
+    private final Button _auxOperateButton    = new JoystickButton(_lStick, 4);
     
     private final Button _homePositionButton  = new JoystickButton(_rStick, 3);
     private final Button _loadPositionButton  = new JoystickButton(_lStick, 3);
@@ -126,6 +127,14 @@ public class OI {
     
     public Button getBallOperateButton() {
     	return _ballOperateButton;
+    }
+    
+    public Button getIntakeOperateButton() {
+    	return _intakeOperateButton;
+    }
+
+    public Button getAuxOperateButton() {
+    	return _auxOperateButton;
     }
     
     public boolean getHomeStateEnabled() {
