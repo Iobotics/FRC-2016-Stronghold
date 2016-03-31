@@ -71,7 +71,7 @@ public class SeekGimbalAzimuth extends CommandBase {
 
     // Called once after isFinished returns true
     protected void end() {
-    	shooterGimbal.setAzimuthPower(0.0);
+    	//shooterGimbal.setAzimuthPower(0.0);
     }
 
     // Called when another command which requires one or more of the same

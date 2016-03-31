@@ -10,7 +10,7 @@ public class SetCameraPosition extends CommandBase {
 	private final boolean _terminate;
 	
 	public static final double STOWED_POSITION = 0.25;
-	public static final double INTAKE_POSITION = 0.80;
+	public static final double INTAKE_POSITION = 1.0;
 	public static final double SHOT_POSITION   = 0.9;
 		
 	// fixed positions //

@@ -93,6 +93,9 @@ public class OperateGimbalFast extends CommandBase {
     // Called once after isFinished returns true
     protected void end() {
     	shooterGimbal.setElevationEnvelope(ElevationEnvelope.Full);
+    	// hold position //
+    	shooterGimbal.setAzimuthSetpointDegrees(shooterGimbal.getAzimuthDegrees());
+    	shooterGimbal.setElevationSetpointDegrees(shooterGimbal.getElevationDegrees());
     }
 
     // Called when another command which requires one or more of the same

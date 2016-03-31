@@ -38,11 +38,9 @@ public class DriveTrain extends Subsystem {
 	private static final double ENCODER_INCHES_PER_REV = WHEEL_INCHES_PER_REV * ENCODER_PINION_TEETH / WHEEL_GEAR_TEETH;
 	
     public void init()  {
-    	System.out.println("drive init start");
-    	
         // configure left //
     	_left = new CANTalon(RobotMap.driveLeftMain);
-    	_left.setInverted(true);
+    	//_left.setInverted(true);
     	_left.setFeedbackDevice(FeedbackDevice.QuadEncoder);
     	_left.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
     	_left.reverseSensor(true);
@@ -56,6 +54,7 @@ public class DriveTrain extends Subsystem {
         
         // configure right //
         _right = new CANTalon(RobotMap.driveRightMain);
+        _right.setInverted(true);
         _right.setFeedbackDevice(FeedbackDevice.QuadEncoder);
         _right.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
         _right.setPosition(0.0);
@@ -66,9 +65,6 @@ public class DriveTrain extends Subsystem {
         _rightSlave2.changeControlMode(TalonControlMode.Follower);
         _rightSlave2.set(_right.getDeviceID());
         
-       // _lPID = new PIDController(kP, kI, kD, _lEncoder, _lPIDOutput);
-        //_rPID = new PIDController(kP, kI, kD, _rEncoder, _rPIDOutput);
-        System.out.println("drive init end");
     }
 
     public void initDefaultCommand() {
@@ -109,6 +105,9 @@ public class DriveTrain extends Subsystem {
                 right = -(right * right);
             }
         }
+    	
+    	SmartDashboard.putNumber("drive-right-tank", right);
+    	SmartDashboard.putNumber("drive-left-tank", left);
     	
     	_left.set(left);
     	_right.set(right);
@@ -191,6 +190,9 @@ public class DriveTrain extends Subsystem {
     }
     
     public void debug() {
+    	SmartDashboard.putNumber("drive-left-power", _left.get());
+    	SmartDashboard.putNumber("drive-right-power", _right.get());
+    	
     	SmartDashboard.putNumber("drive-left-distance", this.getLeftEncoderDistance());
     	SmartDashboard.putNumber("drive-right-distance", this.getRightEncoderDistance());
     }    

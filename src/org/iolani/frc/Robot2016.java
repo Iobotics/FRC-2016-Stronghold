@@ -46,29 +46,27 @@ public class Robot2016 extends IterativeRobot {
     	_compressor.clearAllPCMStickyFaults();
     	_compressor.start();
     	
-    	/*_autoChooser = new SendableChooser();
-    	_autoChooser.addDefault("Do Nothing",  new CommandGroup());
-    	_autoChooser.addObject("Trash Can 3", new AutoGrabTrashCan(AutoGrabTrashCan.kLEFT));
-    	_autoChooser.addObject("Trash Can 1", new AutoGrabTrashCan(AutoGrabTrashCan.kRIGHT));
-    	_autoChooser.addObject("Drive Only", new AutoDriveOnly());*/
-    	//SmartDashboard.putData("Autonomous mode chooser", _autoChooser);
     	_prefs = Preferences.getInstance();
-    	
-        // instantiate the command used for the autonomous period
-        //_autoCommand = new AutoGrabTrashCan();
-		//_autoCommand = new AutoDriveOnly();
         
     	CommandBase.init();
 		new CalibrateNavigationSensor().start();
     }
-	
+
+    /**
+     * This function is called when the disabled button is hit.
+     * You can use it to reset subsystems before shutting down.
+     */
+    public void disabledInit() {
+
+    }
+    
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
 		SmartDashboard.putData(Scheduler.getInstance());
 	}
 
     public void autonomousInit() {
-    	//_autoCommand = (Command) _autoChooser.getSelected();
+    	// pick auto command via program number //
     	switch(_prefs.getInt("auto-program-number", 0)) {
     		case 0: _autoCommand = null; break;
 //    		case 1: _autoCommand = new AutoGrabTrashCan(AutoGrabTrashCan.kLEFT); break;
@@ -99,14 +97,6 @@ public class Robot2016 extends IterativeRobot {
     }
 
     /**
-     * This function is called when the disabled button is hit.
-     * You can use it to reset subsystems before shutting down.
-     */
-    public void disabledInit() {
-
-    }
-
-    /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
@@ -119,7 +109,6 @@ public class Robot2016 extends IterativeRobot {
         CommandBase.camera.debug();
         CommandBase.navsensor.debug();
         
-        SmartDashboard.putBoolean("home-mode",   CommandBase.oi.getHomeStateEnabled());
         SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
     }
     

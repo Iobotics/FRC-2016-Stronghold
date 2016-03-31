@@ -68,9 +68,7 @@ public class ShooterWheels extends Subsystem {
     
     public void debug() {
      	SmartDashboard.putNumber("shooter-left-rpm", -(int) _left.getSpeed());
-     	//SmartDashboard.putNumber("shooter-left-error", _left.getClosedLoopError());
     	SmartDashboard.putNumber("shooter-right-rpm", -(int) _right.getSpeed());
-    	//SmartDashboard.putNumber("shooter-right-error", _right.getClosedLoopError());
     }
 }
 

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.iolani.frc.commands.CommandBase;
 
@@ -12,14 +13,16 @@ import org.iolani.frc.commands.CommandBase;
  */
 public class AutoDriveStraight extends CommandBase implements PIDOutput, PIDSource {
 	
+	
 	private final double  _distance;
 	private PIDController _pid;
 	
-	private static final double kP = 0.20;
+	private static final double kP = 0.40;
 	private static final double kI = 0.0;
-	private static final double kD = 0.4;
+	private static final double kD = 0;
 	
-	private static final double kTurn = 0.1;
+	private static final double MAX_GYRO = 0.25;
+	private static final double kTurn = 0.01;
 	
 	public AutoDriveStraight(double inches) {
     	this(inches, -1);
@@ -33,21 +36,35 @@ public class AutoDriveStraight extends CommandBase implements PIDOutput, PIDSour
     	if(timeout > 0) {
     		this.setTimeout(timeout);
     	}
+    	_pid = new PIDController(kP, kI, kD, this, this);
+		//_pid.setAbsoluteTolerance(1.0); // 2 inch tolerance //
+    	_pid.setTolerance(new PIDController.Tolerance() {
+				@Override
+				public boolean onTarget() {
+					return  Math.abs(_pid.getError()) < 0.5;
+				}	
+    		});
+		//_pid.setToleranceBuffer(2);
+    	_pid.setOutputRange(-0.35, 0.35);
     }
 
     public void pidWrite(double leftPower) {
-    	double rightPower = leftPower + kTurn * navsensor.getGyro();
-    	// FIXME. setTank is backwards //
-    	drivetrain.setTank(-leftPower, -rightPower);
+    	double gyro = kTurn * navsensor.getGyro();
+    	if(gyro > MAX_GYRO) {
+    		gyro = MAX_GYRO;
+    	} else if(gyro < -MAX_GYRO) {
+    		gyro = -MAX_GYRO;
+    	}
+    	
+    	double rightPower = leftPower + gyro; 
+    	leftPower = leftPower - gyro;
+    	
+    	drivetrain.setTank(leftPower, rightPower);
     }
     
     // Called just before this Command runs the first time
     protected void initialize() {
-    	if(_pid == null) {
-    		_pid = new PIDController(kP, kI, kD, this, this);
-    		_pid.setAbsoluteTolerance(1.0); // 2 inch tolerance //
-        	_pid.setOutputRange(-0.35, 0.35);
-    	}
+    	SmartDashboard.putData("DrivePID", _pid);
     	drivetrain.setLeftEncoderDistance(0.0);
     	navsensor.zeroGyro();
     	_pid.setSetpoint(_distance);
@@ -56,6 +73,8 @@ public class AutoDriveStraight extends CommandBase implements PIDOutput, PIDSour
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	SmartDashboard.putNumber("drive-auto-error", _pid.getError());
+    	SmartDashboard.putBoolean("drive-auto-ontarget", _pid.onTarget());
     }
 
     // Make this return true when this Command no longer needs to run execute()

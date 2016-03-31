@@ -7,9 +7,12 @@ import org.iolani.frc.commands.CommandBase;
  */
 public class CalibrateNavigationSensor extends CommandBase {
 
+	private static final int TIMEOUT_SECS = 10;
+	
     public CalibrateNavigationSensor() {
     	requires(navsensor);
     	this.setRunWhenDisabled(true);
+    	//this.setTimeout(TIMEOUT_SECS);
     }
 
     // Called just before this Command runs the first time
@@ -22,7 +25,7 @@ public class CalibrateNavigationSensor extends CommandBase {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return !navsensor.isCalibrating();
+        return !navsensor.isCalibrating() || this.isTimedOut();
     }
 
     // Called once after isFinished returns true

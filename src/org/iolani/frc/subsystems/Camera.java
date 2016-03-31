@@ -9,6 +9,8 @@ import org.iolani.frc.RobotMap;
 //import org.iolani.frc.commands.SetCameraPosition;
 //import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
 //import org.iolani.frc.commands.debug.OperateCameraServo;
+import org.iolani.frc.commands.SetCameraPosition;
+import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -88,7 +90,7 @@ public class Camera extends Subsystem {
     }
     
     public void initDefaultCommand() {
-    	//this.setDefaultCommand(new SetCameraPosition(CameraPosition.Stowed));
+    	this.setDefaultCommand(new SetCameraPosition(CameraPosition.Stowed, false));
     	//this.setDefaultCommand(new OperateCameraServo());
     }
     

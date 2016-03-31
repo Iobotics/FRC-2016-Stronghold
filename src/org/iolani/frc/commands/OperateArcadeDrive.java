@@ -30,8 +30,8 @@ public class OperateArcadeDrive extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        double mag  = oi.getRightStick().getY();
-        double rot = oi.getLeftStick().getX();
+        double mag = -oi.getRightStick().getY();
+        double rot = -oi.getLeftStick().getX();
         
         // signal conditioning //
         PowerScaler driveScale = _scaler;

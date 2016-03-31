@@ -204,9 +204,9 @@ public class ShooterGimbal extends Subsystem {
     
     public void debug() {
      	SmartDashboard.putNumber("gimbal-azimuth-position", this.getAzimuthDegrees());
-     	SmartDashboard.putNumber("gimbal-azimuth-pot", this.getAzimuthPotDegrees());
+     	//SmartDashboard.putNumber("gimbal-azimuth-pot", this.getAzimuthPotDegrees());
     	SmartDashboard.putNumber("gimbal-elevation-position", this.getElevationDegrees());
-    	SmartDashboard.putNumber("gimbal-elevation-pot", this.getElevationPotDegrees());
+    	//ElevationEnvelope.SmartDashboard.putNumber("gimbal-elevation-pot", this.getElevationPotDegrees());
     }
 }
 

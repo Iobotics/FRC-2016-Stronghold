@@ -13,6 +13,9 @@ import org.iolani.frc.commands.*;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
 import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
 import org.iolani.frc.commands.auto.AutoDriveStraight;
+import org.iolani.frc.commands.auto.AutoLowBarAndShoot;
+import org.iolani.frc.commands.auto.AutoTurn;
+import org.iolani.frc.commands.debug.ResetDriveEncoders;
 import org.iolani.frc.commands.debug.RunCameraCommand;
 import org.iolani.frc.subsystems.Camera.CameraCommand;
 //import org.iolani.frc.commands.auto.AutoDriveStraight;
@@ -26,10 +29,7 @@ import org.iolani.frc.subsystems.Camera.CameraCommand;
 public class OI {
 	private static final int XSTICK_LTRIGGER_AXIS = 2;
 	private static final int XSTICK_RTRIGGER_AXIS = 3;
-	
-	// persistent virtual button used to store home mode state //
-	private final InternalButton _homeModeState = new InternalButton();
-	
+
 	// persistent virtual button used to store gunner mode state //
 	private final InternalButton _gunnerModeState = new InternalButton();
 	
@@ -69,7 +69,12 @@ public class OI {
     
     
     // auto test buttons //
+    private final Button _autoTestButton0  = new JoystickButton(_rStick, 7);
     private final Button _autoTestButton1  = new JoystickButton(_rStick, 8);
+    private final Button _autoTestButton2  = new JoystickButton(_rStick, 9);
+    private final Button _autoTestButton3  = new JoystickButton(_rStick, 10);
+    private final Button _autoTestButton4  = new JoystickButton(_rStick, 11);
+    private final Button _autoTestButton5  = new JoystickButton(_rStick, 6);
     
     /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
     private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
@@ -111,10 +116,12 @@ public class OI {
         /*
         _navCalibrateButton.whenPressed(new CalibrateNavigationSensor());
         */
+        _autoTestButton0.whenPressed(new ResetDriveEncoders());
         _autoTestButton1.whenPressed(new AutoDriveStraight(36));
-        //_autoTestButton2.whenPressed(new AutoDriveStraight(120));
-        //_autoTestButton3.whenPressed(new AutoTurn(90));
-        //_autoTestButton4.whenPressed(new AutoGrabTrashCan());
+        _autoTestButton2.whenPressed(new AutoDriveStraight(400));
+        _autoTestButton3.whenPressed(new AutoTurn(90));
+        _autoTestButton4.whenPressed(new AutoLowBarAndShoot(false));
+        _autoTestButton5.whenPressed(new AutoLowBarAndShoot(true));
     }
     
     public Joystick getLeftStick()  {
@@ -135,14 +142,6 @@ public class OI {
 
     public Button getAuxOperateButton() {
     	return _auxOperateButton;
-    }
-    
-    public boolean getHomeStateEnabled() {
-    	return _homeModeState.get();
-    }
-    
-    public void setHomeStateEnabled(boolean enabled) {
-    	_homeModeState.setPressed(enabled);
     }
     
     public boolean getGunnerControlEnabled() {

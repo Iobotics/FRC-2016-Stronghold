@@ -18,14 +18,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class SeekGimbalToVision extends PIDCommand {
    
-	private static final double SPEED_DEG_PER_SEC = 3.5;
-	private static final double STEP_SIZE_DEGREES = 1.0;
+	public static final double SPEED_DEG_PER_SEC = 3.5;
+	public static final double STEP_SIZE_DEGREES = 1.0;
 	
-	private static final double K_P = 2;
-	private static final double K_I = 0;
-	private static final double K_D = 0;
+	public static final double K_P = 2;
+	public static final double K_I = 0;
+	public static final double K_D = 0;
 	
-	private static final double MAX_OFFSET = 20;
+	public static final double MAX_OUTPUT = 3;
 	
 	private double _elevationCurrent;
 	private double _lastTime;
@@ -36,7 +36,8 @@ public class SeekGimbalToVision extends PIDCommand {
     	super("GimbalVisionPID", K_P, K_I, K_D);
         requires(CommandBase.shooterGimbal);
         _table = NetworkTable.getTable("SmartDashboard");
-        SmartDashboard.putData("GimbalPID", this.getPIDController());
+        //SmartDashboard.putData("GimbalPID", this.getPIDController());
+        this.getPIDController().setOutputRange(-MAX_OUTPUT, MAX_OUTPUT);
     }
 
     // Called just before this Command runs the first time
@@ -55,15 +56,9 @@ public class SeekGimbalToVision extends PIDCommand {
 	// control the azimuth power with PID output //
 	@Override
 	protected void usePIDOutput(double output) {
-		/*
-		double power = Utility.window(output, MAX_POWER);
-		CommandBase.shooterGimbal.setAzimuthPower(power);
-    	SmartDashboard.putNumber("vision-power", power);
-    	*/
-		double offset = Utility.window(output, MAX_OFFSET);
 		double azimuth = CommandBase.shooterGimbal.getAzimuthDegrees();
-		SmartDashboard.putNumber("vision-command", offset);
-		CommandBase.shooterGimbal.setAzimuthSetpointDegrees(azimuth + offset);
+		SmartDashboard.putNumber("vision-command", output);
+		CommandBase.shooterGimbal.setAzimuthSetpointDegrees(azimuth + output);
 		
 		/*double dist = _table.getNumber("vision-distance", 45);
 		double elevation = -0.139*dist + 64.7;
@@ -111,10 +106,10 @@ public class SeekGimbalToVision extends PIDCommand {
 
     // Called once after isFinished returns true
     protected void end() {
-    	CommandBase.shooterGimbal.setAzimuthPower(0);
-    	CommandBase.shooterGimbal.setElevationPower(0);
-    	SmartDashboard.putNumber("vision-power", 0);
-    	CommandBase.shooterGimbal.setElevationEnvelope(ElevationEnvelope.Full);
+    	//CommandBase.shooterGimbal.setAzimuthPower(0);
+    	//CommandBase.shooterGimbal.setElevationPower(0);
+    	SmartDashboard.putNumber("vision-command", 0);
+    	CommandBase.shooterGimbal.setElevationEnvelope(ElevationEnvelope.Full);	
     }
 
     // Called when another command which requires one or more of the same
