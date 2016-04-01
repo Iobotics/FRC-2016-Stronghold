@@ -41,7 +41,7 @@ public class DriveTrain extends Subsystem {
         // configure left //
     	_left = new CANTalon(RobotMap.driveLeftMain);
     	//_left.setInverted(true);
-    	_left.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+    	//_left.setFeedbackDevice(FeedbackDevice.QuadEncoder);
     	_left.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
     	_left.reverseSensor(true);
     	_left.setPosition(0.0);
@@ -55,7 +55,7 @@ public class DriveTrain extends Subsystem {
         // configure right //
         _right = new CANTalon(RobotMap.driveRightMain);
         _right.setInverted(true);
-        _right.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+        //_right.setFeedbackDevice(FeedbackDevice.QuadEncoder);
         _right.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
         _right.setPosition(0.0);
         _rightSlave1 = new CANTalon(RobotMap.driveRightSlave1);

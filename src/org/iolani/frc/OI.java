@@ -15,6 +15,7 @@ import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
 import org.iolani.frc.commands.auto.AutoDriveStraight;
 import org.iolani.frc.commands.auto.AutoLowBarAndShoot;
 import org.iolani.frc.commands.auto.AutoTurn;
+import org.iolani.frc.commands.auto.AutoVisionAzimuth;
 import org.iolani.frc.commands.debug.ResetDriveEncoders;
 import org.iolani.frc.commands.debug.RunCameraCommand;
 import org.iolani.frc.subsystems.Camera.CameraCommand;
@@ -118,10 +119,10 @@ public class OI {
         */
         _autoTestButton0.whenPressed(new ResetDriveEncoders());
         _autoTestButton1.whenPressed(new AutoDriveStraight(36));
-        _autoTestButton2.whenPressed(new AutoDriveStraight(400));
+        _autoTestButton2.whenPressed(new AutoDriveStraight(150));
         _autoTestButton3.whenPressed(new AutoTurn(90));
         _autoTestButton4.whenPressed(new AutoLowBarAndShoot(false));
-        _autoTestButton5.whenPressed(new AutoLowBarAndShoot(true));
+        _autoTestButton5.whenPressed(new AutoVisionAzimuth(5));
     }
     
     public Joystick getLeftStick()  {

@@ -23,12 +23,17 @@ public class AutoDriveStraight extends CommandBase implements PIDOutput, PIDSour
 	
 	private static final double MAX_GYRO = 0.25;
 	private static final double kTurn = 0.01;
+	private static final double DEFAULT_POWER = 0.35;
 	
 	public AutoDriveStraight(double inches) {
-    	this(inches, -1);
+    	this(inches, -1, DEFAULT_POWER);
     }
 	
-    public AutoDriveStraight(double inches, double timeout) {
+	public AutoDriveStraight(double inches, double timeout) {
+    	this(inches, timeout, DEFAULT_POWER);
+    }
+	
+    public AutoDriveStraight(double inches, double timeout, double power) {
     	requires(drivetrain);
     	requires(navsensor);
     	//_distance = -inches * (12.0 / 13.0);
@@ -45,7 +50,7 @@ public class AutoDriveStraight extends CommandBase implements PIDOutput, PIDSour
 				}	
     		});
 		//_pid.setToleranceBuffer(2);
-    	_pid.setOutputRange(-0.35, 0.35);
+    	_pid.setOutputRange(-power, power);
     }
 
     public void pidWrite(double leftPower) {

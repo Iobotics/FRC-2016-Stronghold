@@ -3,6 +3,10 @@ package org.iolani.frc;
 
 import org.iolani.frc.commands.*;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
+import org.iolani.frc.commands.auto.AutoDriveOnly;
+import org.iolani.frc.commands.auto.AutoDriveStraight;
+import org.iolani.frc.commands.auto.AutoGimbalAndShoot;
+import org.iolani.frc.commands.auto.AutoLowBarAndShoot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -10,6 +14,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.PrintCommand;
 //import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -57,21 +62,25 @@ public class Robot2016 extends IterativeRobot {
      * You can use it to reset subsystems before shutting down.
      */
     public void disabledInit() {
-
+    	SmartDashboard.putData(Scheduler.getInstance());
     }
     
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
-		SmartDashboard.putData(Scheduler.getInstance());
+		
+		int autonum = _prefs.getInt("auto-program-number", 0);
+    	SmartDashboard.putNumber("auto-num", autonum);
 	}
 
     public void autonomousInit() {
+    	int autonum = _prefs.getInt("auto-program-number", 0);
+    	SmartDashboard.putNumber("auto-num", autonum);
     	// pick auto command via program number //
-    	switch(_prefs.getInt("auto-program-number", 0)) {
-    		case 0: _autoCommand = null; break;
-//    		case 1: _autoCommand = new AutoGrabTrashCan(AutoGrabTrashCan.kLEFT); break;
-//   		case 2: _autoCommand = new AutoGrabTrashCan(AutoGrabTrashCan.kRIGHT); break;
-//   		case 3: _autoCommand = new AutoDriveOnly(); break;
+    	switch(autonum) {
+    		case 0: _autoCommand = new PrintCommand("Nihilism: Never Not Nothing"); break;
+    		case 1: _autoCommand = new AutoDriveOnly(); break;
+    		case 2: _autoCommand = new AutoLowBarAndShoot(true); break;
+    		case 3: _autoCommand = new AutoGimbalAndShoot(240, 47.0, 0.0); break;
     		default: _autoCommand = null; break;
     	}
     	if(_autoCommand != null) _autoCommand.start();
@@ -82,6 +91,15 @@ public class Robot2016 extends IterativeRobot {
      */
     public void autonomousPeriodic() {
         Scheduler.getInstance().run();
+        
+        CommandBase.intake.debug();
+        CommandBase.shooterWheels.debug();
+        CommandBase.shooterGimbal.debug();
+        CommandBase.drivetrain.debug();
+        CommandBase.camera.debug();
+        CommandBase.navsensor.debug();
+        
+        SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
     }
 
     public void teleopInit() {

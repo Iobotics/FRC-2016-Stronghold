@@ -16,9 +16,9 @@ public class AutoTurn extends CommandBase implements PIDOutput {
     private boolean       _onTarget;
     private double        _onTargetTime;
 	
-	private static final double kP = 0.025;
-	private static final double kI = 0.0001;
-	private static final double kD = 0.2;
+	private static final double kP = 0.050;
+	private static final double kI = 0.0;
+	private static final double kD = 0.0;
 	
     public AutoTurn(double degrees) { //Counterclockwise is positive
     	requires(drivetrain);
@@ -27,14 +27,15 @@ public class AutoTurn extends CommandBase implements PIDOutput {
     	_pid = new PIDController(kP, kI, kD, navsensor, this);
     	_pid.setInputRange(-180.0f,  180.0f);
     	_pid.setContinuous(true);
-    	_pid.setTolerance(new PIDController.Tolerance() {
+    	/*_pid.setTolerance(new PIDController.Tolerance() {
 			@Override
 			public boolean onTarget() {
-				return  Math.abs(_pid.getError()) < 0.5;
+				return  Math.abs(_pid.getError()) < 1.5;
 			}	
-		});
+		});*/
+    	_pid.setAbsoluteTolerance(2.0);
     	_pid.setToleranceBuffer(5);
-    	_pid.setOutputRange(-0.25, 0.25);
+    	_pid.setOutputRange(-0.5, 0.5);
     	this.setTimeout(10);
     }
 
