@@ -6,9 +6,7 @@ package org.iolani.frc.commands.auto;
 
 import org.iolani.frc.commands.CommandBase;
 import org.iolani.frc.commands.SeekGimbalToVision;
-import org.iolani.frc.subsystems.ShooterGimbal;
 import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
-import org.iolani.frc.util.Utility;
 
 import edu.wpi.first.wpilibj.command.PIDCommand;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -19,14 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * @author iobotics
  */
 public class AutoVisionAzimuth extends PIDCommand {
-   
-	private static final double SPEED_DEG_PER_SEC = 3.5;
-	private static final double STEP_SIZE_DEGREES = 1.0;
 	
-	
-	private double _elevationCurrent;
-	private double _lastTime;
-	private int    _lastPOV;
 	private final NetworkTable _table;
 	
     public AutoVisionAzimuth(double timeout) {

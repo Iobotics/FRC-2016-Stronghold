@@ -1,6 +1,5 @@
 package org.iolani.frc.commands.auto;
 
-import org.iolani.frc.commands.SeekGimbalAzimuth;
 import org.iolani.frc.commands.SeekGimbalElevation;
 import org.iolani.frc.commands.SeekGimbalToPosition;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
@@ -16,8 +15,8 @@ import edu.wpi.first.wpilibj.command.WaitCommand;
 public class AutoLowBarAndShoot extends CommandGroup {
 
 	public AutoLowBarAndShoot(boolean vision) {
-		this.addSequential(new AutoDriveStraight(240));
-		this.addParallel(new SeekGimbalElevation(47.0));
+		this.addSequential(new AutoDriveStraight(228));
+		this.addParallel(new SeekGimbalElevation(45.0));
 		this.addParallel(new SetCameraPosition(CameraPosition.ShotOptimal));
 		this.addSequential(new AutoTurn(55.0));
 		if(vision) {
@@ -25,7 +24,6 @@ public class AutoLowBarAndShoot extends CommandGroup {
 		} else {
 			this.addSequential(new WaitCommand(3));
 		}
-		//this.addSequential(new SeekGimbalAzimuth(20.0));
 		this.addSequential(new SetShooterWheelSpeed(5500, true));
 		this.addSequential(new WaitCommand(1));
 		this.addSequential(new SetShooterKicker(true, true));

@@ -3,10 +3,7 @@ package org.iolani.frc;
 
 import org.iolani.frc.commands.*;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
-import org.iolani.frc.commands.auto.AutoDriveOnly;
-import org.iolani.frc.commands.auto.AutoDriveStraight;
-import org.iolani.frc.commands.auto.AutoGimbalAndShoot;
-import org.iolani.frc.commands.auto.AutoLowBarAndShoot;
+import org.iolani.frc.commands.auto.*;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -70,6 +67,8 @@ public class Robot2016 extends IterativeRobot {
 		
 		int autonum = _prefs.getInt("auto-program-number", 0);
     	SmartDashboard.putNumber("auto-num", autonum);
+    	
+    	this.debugStuff();
 	}
 
     public void autonomousInit() {
@@ -79,8 +78,11 @@ public class Robot2016 extends IterativeRobot {
     	switch(autonum) {
     		case 0: _autoCommand = new PrintCommand("Nihilism: Never Not Nothing"); break;
     		case 1: _autoCommand = new AutoDriveOnly(); break;
-    		case 2: _autoCommand = new AutoLowBarAndShoot(true); break;
-    		case 3: _autoCommand = new AutoGimbalAndShoot(240, 47.0, 0.0); break;
+    		case 2: _autoCommand = new AutoLowBarAndShoot3(true); break;
+    		case 3: _autoCommand = new AutoGimbalAndShoot(200, 47.0, 0.0); break;
+    		case 4: _autoCommand = new AutoGimbalAndShoot(240, 50.0, 20.0); break;
+    		case 5: _autoCommand = new AutoGimbalAndShoot(240, 50.0, -20.0); break;
+    		case 9: _autoCommand = new AutoLowBarAndShoot(true); break;
     		default: _autoCommand = null; break;
     	}
     	if(_autoCommand != null) _autoCommand.start();
@@ -92,14 +94,7 @@ public class Robot2016 extends IterativeRobot {
     public void autonomousPeriodic() {
         Scheduler.getInstance().run();
         
-        CommandBase.intake.debug();
-        CommandBase.shooterWheels.debug();
-        CommandBase.shooterGimbal.debug();
-        CommandBase.drivetrain.debug();
-        CommandBase.camera.debug();
-        CommandBase.navsensor.debug();
-        
-        SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
+        this.debugStuff();
     }
 
     public void teleopInit() {
@@ -120,14 +115,7 @@ public class Robot2016 extends IterativeRobot {
     public void teleopPeriodic() {
         Scheduler.getInstance().run();
         
-        CommandBase.intake.debug();
-        CommandBase.shooterWheels.debug();
-        CommandBase.shooterGimbal.debug();
-        CommandBase.drivetrain.debug();
-        CommandBase.camera.debug();
-        CommandBase.navsensor.debug();
-        
-        SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
+        this.debugStuff();
     }
     
     /**
@@ -135,5 +123,16 @@ public class Robot2016 extends IterativeRobot {
      */
     public void testPeriodic() {
         LiveWindow.run();
+    }
+    
+    public void debugStuff() {
+    	CommandBase.intake.debug();
+        CommandBase.shooterWheels.debug();
+        CommandBase.shooterGimbal.debug();
+        CommandBase.drivetrain.debug();
+        CommandBase.camera.debug();
+        CommandBase.navsensor.debug();
+        
+        SmartDashboard.putBoolean("gunner-mode", CommandBase.oi.getGunnerControlEnabled());
     }
 }

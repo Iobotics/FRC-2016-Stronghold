@@ -7,7 +7,7 @@ import org.iolani.frc.commands.CommandBase;
  */
 public class CalibrateNavigationSensor extends CommandBase {
 
-	private static final int TIMEOUT_SECS = 10;
+	//private static final int TIMEOUT_SECS = 10;
 	
     public CalibrateNavigationSensor() {
     	requires(navsensor);

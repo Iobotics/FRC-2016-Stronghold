@@ -26,14 +26,14 @@ public class AutoDriveStraight extends CommandBase implements PIDOutput, PIDSour
 	private static final double DEFAULT_POWER = 0.35;
 	
 	public AutoDriveStraight(double inches) {
-    	this(inches, -1, DEFAULT_POWER);
+    	this(inches, DEFAULT_POWER, -1);
     }
 	
-	public AutoDriveStraight(double inches, double timeout) {
-    	this(inches, timeout, DEFAULT_POWER);
+	public AutoDriveStraight(double inches, double power) {
+    	this(inches, power, -1);
     }
 	
-    public AutoDriveStraight(double inches, double timeout, double power) {
+    public AutoDriveStraight(double inches, double power, double timeout) {
     	requires(drivetrain);
     	requires(navsensor);
     	//_distance = -inches * (12.0 / 13.0);

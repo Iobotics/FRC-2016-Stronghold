@@ -8,20 +8,11 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
 import org.iolani.frc.util.ConditionalButton;
 import org.iolani.frc.util.JoystickAxisThresholdButton;
-import org.iolani.frc.util.PowerScaler;
+//import org.iolani.frc.util.PowerScaler;
 import org.iolani.frc.commands.*;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
-import org.iolani.frc.commands.SetCameraPosition.CameraPosition;
-import org.iolani.frc.commands.auto.AutoDriveStraight;
-import org.iolani.frc.commands.auto.AutoLowBarAndShoot;
-import org.iolani.frc.commands.auto.AutoTurn;
-import org.iolani.frc.commands.auto.AutoVisionAzimuth;
-import org.iolani.frc.commands.debug.ResetDriveEncoders;
-import org.iolani.frc.commands.debug.RunCameraCommand;
-import org.iolani.frc.subsystems.Camera.CameraCommand;
-//import org.iolani.frc.commands.auto.AutoDriveStraight;
-//import org.iolani.frc.commands.auto.AutoGrabTrashCan;
-//import org.iolani.frc.commands.auto.AutoTurn;
+import org.iolani.frc.commands.auto.*;
+//import org.iolani.frc.commands.debug.*;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -77,17 +68,6 @@ public class OI {
     private final Button _autoTestButton4  = new JoystickButton(_rStick, 11);
     private final Button _autoTestButton5  = new JoystickButton(_rStick, 6);
     
-    /*private final JoystickButton _shooterKickButton = new JoystickButton(_lStick, 1);
-    private final JoystickButton _shooterOutButton  = new JoystickButton(_lStick, 6);
-    private final JoystickButton _shooterInButton   = new JoystickButton(_lStick, 7);
-    
-    private final JoystickButton _shooterInButton2  = new JoystickButton(_lStick, 8);
-    private final JoystickButton _shooterOutButton2 = new JoystickButton(_lStick, 9);
-    
-    private final JoystickButton _shooterOutButton3 = new JoystickButton(_lStick, 11);
-    private final JoystickButton _shooterInButton3  = new JoystickButton(_lStick, 10);
-    */
-    
     public OI() {
         
         _intakeButton.whileHeld(new IntakeBall());
@@ -95,9 +75,6 @@ public class OI {
         
         _homePositionButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.Home));
         _loadPositionButton.whenPressed(new LoadBall());
-        
-        // broken for now //
-        //_cameraSpyButton.whileHeld(new SetCameraPosition(CameraPosition.IntakeSight));
         
         _gunnerLowButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerLow));
         _gunnerMidButton.whenPressed(new SeekGimbalToPosition(GimbalPosition.GunnerMiddle));
@@ -113,12 +90,8 @@ public class OI {
         _gunnerDriveButton.whileHeld(new OperateGunnerDrive());
         _gunnerVisionButton.whileHeld(new SeekGimbalToVision());
         
-        
-        /*
-        _navCalibrateButton.whenPressed(new CalibrateNavigationSensor());
-        */
-        _autoTestButton0.whenPressed(new ResetDriveEncoders());
-        _autoTestButton1.whenPressed(new AutoDriveStraight(36));
+        _autoTestButton0.whenPressed(new AutoDriveTimed(2.0, AutoDriveDeadReckon.DEFAULT_POWER,  AutoDriveDeadReckon.DEFAULT_POWER * 0.9));
+        _autoTestButton1.whenPressed(new AutoDriveDeadReckon(120, AutoDriveDeadReckon.DEFAULT_POWER, AutoDriveDeadReckon.DEFAULT_POWER * 0.9));
         _autoTestButton2.whenPressed(new AutoDriveStraight(150));
         _autoTestButton3.whenPressed(new AutoTurn(90));
         _autoTestButton4.whenPressed(new AutoLowBarAndShoot(false));
@@ -156,20 +129,4 @@ public class OI {
     public Joystick getGunnerStick() {
     	return _xStick;
     }
-        
-    /*public Button getIntakeLeftButton() {
-    	return _intakeLeftButton;
-    }
-    
-    public double getLeftTwist() {
-    	return _lStick.getTwist();
-    }
-    
-    public Button getIntakeRightButton() {
-    	return _intakeRightButton;
-    }
-    
-    public double getRightTwist() {
-    	return _rStick.getTwist();
-    }*/
 }

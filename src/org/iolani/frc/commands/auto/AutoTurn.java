@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class AutoTurn extends CommandBase implements PIDOutput {
 
 	private final double  _degrees;
+	private final boolean _resetGyro;
     private PIDController _pid;
     private boolean       _onTarget;
     private double        _onTargetTime;
@@ -20,10 +21,15 @@ public class AutoTurn extends CommandBase implements PIDOutput {
 	private static final double kI = 0.0;
 	private static final double kD = 0.0;
 	
-    public AutoTurn(double degrees) { //Counterclockwise is positive
+	public AutoTurn(double degrees) {
+		this(degrees, true);
+	}
+	
+    public AutoTurn(double degrees, boolean resetGyro) { //Counterclockwise is positive
     	requires(drivetrain);
     	requires(navsensor);
-    	_degrees = degrees;
+    	_degrees   = degrees;
+    	_resetGyro = resetGyro;
     	_pid = new PIDController(kP, kI, kD, navsensor, this);
     	_pid.setInputRange(-180.0f,  180.0f);
     	_pid.setContinuous(true);
@@ -51,7 +57,9 @@ public class AutoTurn extends CommandBase implements PIDOutput {
     
     // Called just before this Command runs the first time
     protected void initialize() {
-    	navsensor.zeroGyro();
+    	if(_resetGyro) {
+    		navsensor.zeroGyro();
+    	}
     	_pid.setSetpoint(_degrees);
     	_pid.enable();
     	_onTargetTime = Double.MAX_VALUE;

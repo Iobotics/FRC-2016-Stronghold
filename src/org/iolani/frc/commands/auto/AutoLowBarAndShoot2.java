@@ -1,6 +1,6 @@
 package org.iolani.frc.commands.auto;
 
-import org.iolani.frc.commands.SeekGimbalAzimuth;
+import org.iolani.frc.commands.ResetGyro;
 import org.iolani.frc.commands.SeekGimbalElevation;
 import org.iolani.frc.commands.SeekGimbalToPosition;
 import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
@@ -13,17 +13,17 @@ import org.iolani.frc.commands.SetShooterWheelSpeed;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 
-public class AutoGimbalAndShoot extends CommandGroup {
+public class AutoLowBarAndShoot2 extends CommandGroup {
 
-	private static final double VISION_TIME = 5.0;
-	
-	public AutoGimbalAndShoot(double driveDistance, double elevation, double initialAzimuth) {
-		this.addSequential(new AutoDriveStraight(driveDistance));
-		this.addSequential(new SeekGimbalElevation(elevation));
+	public AutoLowBarAndShoot2() {
+		this.addSequential(new AutoDriveStraight(120));
+		this.addSequential(new ResetGyro()); // reset gyro //
+		// make a slight leftward arch to clear wall //
+		this.addSequential(new AutoDriveDeadReckon(120, AutoDriveDeadReckon.DEFAULT_POWER, AutoDriveDeadReckon.DEFAULT_POWER * 0.9));
+		this.addParallel(new SeekGimbalElevation(47.0));
 		this.addParallel(new SetCameraPosition(CameraPosition.ShotOptimal));
-		//this.addSequential(new AutoTurn(55.0));
-		this.addParallel(new SeekGimbalAzimuth(initialAzimuth));
-		this.addSequential(new AutoVisionAzimuth(VISION_TIME));
+		this.addSequential(new AutoTurn(55.0, false)); // turn remainder of 55 deg //
+		this.addSequential(new AutoVisionAzimuth(5));
 		this.addSequential(new SetShooterWheelSpeed(5500, true));
 		this.addSequential(new WaitCommand(1));
 		this.addSequential(new SetShooterKicker(true, true));

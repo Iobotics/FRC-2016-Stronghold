@@ -27,7 +27,7 @@ public class ShooterWheels extends Subsystem {
     	_left.configNominalOutputVoltage(+0.0f, -0.0f);
     	_left.configPeakOutputVoltage(+12.0f, -12.0f);
     	_left.setProfile(1);
-    	_left.setF(0.024);
+    	_left.setF(0.023);
     	_left.setP(0.05);
     	_left.setI(0);
     	_left.setD(5);

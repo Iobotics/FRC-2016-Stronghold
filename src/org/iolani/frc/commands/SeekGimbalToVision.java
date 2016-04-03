@@ -6,7 +6,7 @@ package org.iolani.frc.commands;
 
 import org.iolani.frc.subsystems.ShooterGimbal;
 import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
-import org.iolani.frc.util.Utility;
+//import org.iolani.frc.util.Utility;
 
 import edu.wpi.first.wpilibj.command.PIDCommand;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
