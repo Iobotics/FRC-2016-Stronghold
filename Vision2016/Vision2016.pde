@@ -30,21 +30,21 @@ float targetHeight = 12.0;
 float hueMax = 360.0;
 float satMax = 100.0;
 float valMax = 100.0;
-float targetHueMin = 130; //130
-float targetHueMax = 200; //200
-float targetSatMin = 20.0; //20
-float targetSatMax = 100.0;
+float targetHueMin = 110; //130
+float targetHueMax = 190; //200
+float targetSatMin = 40.0; //20
+float targetSatMax = 120.0;
 float targetValMin = 20.0;
 float targetValMax = 100.0;
-float targetBoundingBoxAreaMin = 0.0005;
-float targetAreaMin = 0.003;
+float targetBoundingBoxAreaMin = 0.0001;
+float targetAreaMin = 0.001;
 //Aspect ratio: Width / height... ideal = 1.6
 float targetAspectRatioMin = 0.25;  
 float targetAspectRatioMax = 3.0;
 float targetAspectRatioIdeal = 1.6;
 //Rectangularity: Area / bounding box area... ideal = 0.3
 float targetRectangularityMin = 0.0;
-float targetRectangularityMax = 3.0;
+float targetRectangularityMax = 5.0;
 
 float imageCenterX = 0.5; //What should the program consider the "center" of the screen (as a proportion of its width and height)?
 float imageCenterY = 0.5;
@@ -56,11 +56,11 @@ float imageCenterY = 0.5;
 //-bk 0 (disable backlight compensation), -gain 0 (disable brightness correction), -cagc 0 (disable color correction), -ex 20 (low exposure), -sa 200 (very high saturation), -co 100 (high contrast)
 //Other settings don't seem to change anything (they're dependent on the camera model)
 IPCapture camera;
-String mjpegURL = "http://10.24.38.227:5800/?action=stream";
+String mjpegURL = "http://roborio-2438-frc.local:5800/?action=stream";
 
 // Camera parameters //
-int cameraWidth = 640;
-int cameraHeight = 480;
+int cameraWidth = 320;
+int cameraHeight = 240;
 String cameraName = "name=Logitech HD Pro Webcam C920,size=800x600,fps=30";
 float cameraFocalLength = 0.1444882; //Inches
 float cameraSensorWidth = 0.188976; //Inches
@@ -91,7 +91,7 @@ float lockedErrorMax = 0.2; //Maximum error to play the "target locked" sound...
 OpenCV opencv;
 
 // Network tables //
-final String networkTableAddress = "10.24.38.227";
+final String networkTableAddress = "roborio-2438-frc.local";//"10.24.38.227";
 NetworkTable networkTable;
 final String networkTableName = "SmartDashboard";
 
@@ -104,7 +104,7 @@ void setup() {
   strokeWeight(1);
   stroke(0.0, 100.0, 100.0); //Red stroke
   size(640, 480);
-  frameRate(10);
+  frameRate(30);
   
   // Initialize network table //
   NetworkTable.setClientMode();
@@ -171,8 +171,7 @@ void draw() {
     ) {
       filteredBlobs.add(blob);
       //println("Distance: " + getTargetDistance(blob));
-      //println("Aspect ratio: " + getBlobAspectRatio(blob));
-      //println("Rectangularity: " + getBlobRectangularity(blob));
+      println("Aspect ratio: " + getBlobAspectRatio(blob) + " " + getBlobRectangularity(blob));
       //println("Area: " + getBlobArea(blob));
       //println("X error: " + getTargetXError(blob));
       //println("Y error: " + getTargetYError(blob));
@@ -184,10 +183,10 @@ void draw() {
   for (Blob blob : filteredBlobs) {
     stroke(240.0, 100.0, 100.0); //Blue stroke
     noFill();
-    rect(denormalize(blob.x, frame.width), denormalize(blob.y, frame.height), denormalize(blob.w, frame.width), denormalize(blob.h, frame.height));
+    rect(denormalize(blob.x, frame.width)*2, denormalize(blob.y, frame.height)*2, denormalize(blob.w, frame.width)*2, denormalize(blob.h, frame.height)*2);
     stroke(200.0, 100.0, 100.0); //Blue stroke
     fill(200.0, 100.0, 100.0); //Blue fill
-    ellipse(denormalize(blob.x, frame.width), denormalize(blob.y, frame.height), 4, 4);
+    ellipse(denormalize(blob.x, frame.width)*2, denormalize(blob.y, frame.height)*2, 4, 4);
     stroke(0.0, 100.0, 100.0); //Red stroke
     noFill();
   }
@@ -196,7 +195,7 @@ void draw() {
   float error;
   
   // Display image //
-  image(frame, 0, 0);
+  image(frame, 0, 0, 640, 480);
   
   // Find bar height with OpenCV //
   // Find largest estimated polygon
@@ -211,7 +210,15 @@ void draw() {
       largestPolygon = polygonApproximation;
     }
     
-    polygonApproximation.draw();
+    //polygonApproximation.draw();
+    fill(30, 100, 100);
+    stroke(30, 100, 100);
+    strokeWeight(2);
+    beginShape(LINES);
+    for(PVector pv :  polygonApproximation.getPoints()) {
+      vertex(pv.x * 2, pv.y * 4);
+    }
+    endShape();
   }
   
   float barLength = -1.0; //Used for distance calculation; if height = -1, then bar height calc failed
@@ -243,8 +250,8 @@ void draw() {
     
     if (upperLeft != null && bottomLeft != null) {
       ellipseMode(CENTER);
-      ellipse(upperLeft.x, upperLeft.y, 4, 4);
-      ellipse(bottomLeft.x, bottomLeft.y, 4, 4);
+      ellipse(upperLeft.x * 2, upperLeft.y * 4, 4, 4);
+      ellipse(bottomLeft.x * 2, bottomLeft.y * 4, 4, 4);
       
       // Find bar height //
       barLength = dist(upperLeft.x, upperLeft.y, bottomLeft.x, bottomLeft.y);
@@ -253,8 +260,8 @@ void draw() {
   
   float estimatedDistance = getDistance(barLength);
   
-  println("Bar length: " + barLength);
-  println("Estimated distance: " + estimatedDistance);
+  //println("Bar length: " + barLength);
+  //println("Estimated distance: " + estimatedDistance);
  
   // Find closest blob by azimuth //
   Blob closestTarget = null;
@@ -300,10 +307,10 @@ void draw() {
     
     // Display text //
     noStroke();
-    text("X error: " + round(getTargetXError(closestTarget) * rounder) / rounder, 60, 30);
-    text("Y error: " + round(getTargetYError(closestTarget) * rounder) / rounder, 60, 60);
-    text("Estimated distance: " + round(estimatedDistance * rounder) / rounder, 60, 90);
-    text("Y Height: " + round((cameraHeight - (closestTarget.y * cameraHeight)) * rounder) / rounder, 60, 120);
+    text("e-X: " + round(getTargetXError(closestTarget) * rounder) / rounder, 60, 30);
+    text("e-Y: " + round(getTargetYError(closestTarget) * rounder) / rounder, 60, 60);
+    text("D: " + round(estimatedDistance * rounder) / rounder, 60, 90);
+    text("h-Y: " + round((cameraHeight - (closestTarget.y * cameraHeight)) * rounder) / rounder, 60, 120);
   
     // Push data to the network table //
     double closestXError = getTargetXError(closestTarget);
@@ -321,8 +328,8 @@ void draw() {
     strokeWeight(1);
     if (target == closestTarget) stroke(110, 100, 100);
     else stroke(50, 100, 70);
-    line(target.x * cameraWidth, (target.y * cameraHeight) + 50, target.x * cameraWidth, (target.y * cameraHeight) - 50);
-    line((target.x * cameraWidth) - 50, target.y * cameraHeight, (target.x * cameraWidth) + 50, target.y * cameraHeight);
+    line((target.x * cameraWidth) * 2, ((target.y * cameraHeight) + 50)*2, (target.x * cameraWidth)*2, ((target.y * cameraHeight) - 50)*2);
+    line(((target.x * cameraWidth) - 50)*2, (target.y * cameraHeight)*2, ((target.x * cameraWidth) + 50)*2, (target.y * cameraHeight)*2);
     
     // Detect lock for audio //
     error = sqrt(pow(getTargetXError(target), 2) + pow(getTargetYError(target), 2));
@@ -339,12 +346,12 @@ void draw() {
   float elevationAngleRounded = round(elevationAngle * rounder) / rounder;
   
   // Display non-target-based data //
-  text("Elevation angle: " + elevationAngleRounded, cameraWidth - 250, cameraHeight - 15);
+  text("Elevation Angle: " + elevationAngleRounded, cameraWidth * 2 - 250, cameraHeight * 2 - 15);
   
   // Camera crosshair //
   stroke(0, 100, 100);
-  line(imageCenterX * cameraWidth, 0, imageCenterX * cameraWidth, cameraHeight);
-  line(0, imageCenterY * cameraHeight, cameraWidth, imageCenterY * cameraHeight);
+  line(imageCenterX * cameraWidth * 2, 0, imageCenterX * cameraWidth * 2, cameraHeight * 2);
+  line(0, imageCenterY * cameraHeight * 2 , cameraWidth * 2, imageCenterY * cameraHeight * 2);
   
   if (leastError != -1) { //If we detect targets, play a sound
     if (leastError <= lockedErrorMax) { //Target locked!
@@ -389,6 +396,8 @@ PImage filterImageHSBRange(PImage img, float minHue, float maxHue, float minSat,
   float sat;
   float val;
   
+  int mousePixel = mouseY/2 * img.width + mouseX/2;
+  
   for (int i = 0; i < imgPixelCount; i++) {
     examinedPixel = img.pixels[i];
     hue = hue(examinedPixel);
@@ -399,6 +408,9 @@ PImage filterImageHSBRange(PImage img, float minHue, float maxHue, float minSat,
     } else { //Bad pixel
       output.pixels[i] = color(0, 0, 0); //Add black pixel
     }
+    /*if(i == mousePixel) {
+      println("mouse HSB", hue, sat, val);
+    }*/
   }
   
   output.updatePixels();
