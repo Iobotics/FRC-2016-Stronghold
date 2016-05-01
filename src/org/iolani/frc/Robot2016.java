@@ -80,8 +80,10 @@ public class Robot2016 extends IterativeRobot {
     		case 1: _autoCommand = new AutoDriveOnly(); break;
     		case 2: _autoCommand = new AutoLowBarAndShoot3(true); break;
     		case 3: _autoCommand = new AutoGimbalAndShoot(200, 47.0, 0.0); break;
-    		case 4: _autoCommand = new AutoGimbalAndShoot(240, 50.0, 20.0); break;
-    		case 5: _autoCommand = new AutoGimbalAndShoot(240, 50.0, -20.0); break;
+    		case 4: _autoCommand = new AutoGimbalAndShoot(230, 53.0, 20.0); break;
+    		case 5: _autoCommand = new AutoGimbalAndShoot(230, 53.0, -20.0); break;
+    		case 6: _autoCommand = new AutoDelayAndDrive(); break;
+    		case 7: _autoCommand = new AutoDriveStraight(40); break;
     		case 9: _autoCommand = new AutoLowBarAndShoot(true); break;
     		default: _autoCommand = null; break;
     	}
