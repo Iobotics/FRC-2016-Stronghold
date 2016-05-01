@@ -30,6 +30,7 @@ public class RobotMap {
     public static final int shooterElevationADC = 1;
     public static final int shooterDebugDIO     = 9;
     
-    // camera //
-    public static final int cameraServoPWM = 0;
+    // camera & distance //
+    public static final int cameraServoPWM   = 0;
+    public static final int distanceServoPWM = 1;
 }

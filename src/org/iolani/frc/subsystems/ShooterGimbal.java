@@ -104,6 +104,7 @@ public class ShooterGimbal extends Subsystem {
     	
     	// elevation pot //
     	_elevationPot = new AnalogPotentiometer(RobotMap.shooterElevationADC, ELEVATION_POT_FULL_SCALE, ELEVATION_OFFSET_DEGREES);
+    	this.setElevationPosition(this.getElevationPotDegrees());
     	
     	// debug DIO: used for scope trigger during step response tuning //
     	_debugDO = new DigitalOutput(RobotMap.shooterDebugDIO);
@@ -144,6 +145,10 @@ public class ShooterGimbal extends Subsystem {
     
     public double getElevationDegrees() {
     	return -_elevation.getPosition() * ELEVATION_DEGREES_PER_REV;
+    }
+    
+    public void setElevationPosition(double degrees) {
+    	_elevation.setPosition(-degrees / ELEVATION_DEGREES_PER_REV);	
     }
     
     public double getElevationPotDegrees() {
@@ -204,9 +209,9 @@ public class ShooterGimbal extends Subsystem {
     
     public void debug() {
      	SmartDashboard.putNumber("gimbal-azimuth-position", this.getAzimuthDegrees());
-     	//SmartDashboard.putNumber("gimbal-azimuth-pot", this.getAzimuthPotDegrees());
+     	SmartDashboard.putNumber("gimbal-azimuth-pot", this.getAzimuthPotDegrees());
     	SmartDashboard.putNumber("gimbal-elevation-position", this.getElevationDegrees());
-    	//ElevationEnvelope.SmartDashboard.putNumber("gimbal-elevation-pot", this.getElevationPotDegrees());
+    	SmartDashboard.putNumber("gimbal-elevation-pot", this.getElevationPotDegrees());
     }
 }
 
