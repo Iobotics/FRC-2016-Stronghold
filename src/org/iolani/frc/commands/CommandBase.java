@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.command.Command;
 
 import org.iolani.frc.OI;
 import org.iolani.frc.subsystems.Camera;
+import org.iolani.frc.subsystems.DistanceSensor;
 import org.iolani.frc.subsystems.DriveTrain;
 import org.iolani.frc.subsystems.Intake;
 import org.iolani.frc.subsystems.NavigationSensor;
@@ -23,13 +24,14 @@ public abstract class CommandBase extends Command {
 
     public static OI oi;
     // Create a single static instance of all of your subsystems
-    public static final DriveTrain    drivetrain    = new DriveTrain();
-    public static final Intake        intake        = new Intake();
-    public static final ShooterKicker shooterKicker = new ShooterKicker();
-    public static final ShooterWheels shooterWheels = new ShooterWheels();
-    public static final ShooterGimbal shooterGimbal = new ShooterGimbal();
-    public static final Camera        camera        = new Camera();
-    public static final NavigationSensor navsensor = new NavigationSensor();
+    public static final DriveTrain       drivetrain    = new DriveTrain();
+    public static final Intake           intake        = new Intake();
+    public static final ShooterKicker    shooterKicker = new ShooterKicker();
+    public static final ShooterWheels    shooterWheels = new ShooterWheels();
+    public static final ShooterGimbal    shooterGimbal = new ShooterGimbal();
+    public static final Camera           camera        = new Camera();
+    public static final DistanceSensor   distance      = new DistanceSensor();
+    public static final NavigationSensor navsensor     = new NavigationSensor();
 
     public static void init() {
         // This MUST be here. If the OI creates Commands (which it very likely
@@ -47,6 +49,7 @@ public abstract class CommandBase extends Command {
         shooterWheels.init();
         shooterGimbal.init();
         camera.init();
+        //distance.init();
     }
 
     public CommandBase(String name) {
