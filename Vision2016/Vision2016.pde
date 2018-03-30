@@ -2,7 +2,9 @@ import gab.opencv.*;
 
 import ipcapture.*;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 // ***NOTE*** Requires installing (through Processing) three libraries: Minim, Video, and BlobDetection //
 import processing.video.*; //Used for cameras connected to this computer
@@ -17,9 +19,6 @@ import ddf.minim.spi.*;
 import ddf.minim.ugens.*;
 
 import blobDetection.*;
-import edu.wpi.first.wpilibj.SimpleRobot;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.image.*;
 
 // Target physical constants //
 float targetWidth = 20.0; //Inches
@@ -50,13 +49,12 @@ float imageCenterX = 0.5; //What should the program consider the "center" of the
 float imageCenterY = 0.5;
 
 // IPCapture //
-//Based on mjpeg-streamer script running on RoboRio to turn the output from a USB camera into an mjpg
-//mjpeg-streamer Readme: https://github.com/robotpy/roborio-packages/blob/2016/ipkg/mjpg-streamer/README.md
+//Based on mjpeg-streamer running on RoboRio to turn the output from a USB camera into an mjpg
 //Important mjpeg-streamer settings (set through SSH config): 
 //-bk 0 (disable backlight compensation), -gain 0 (disable brightness correction), -cagc 0 (disable color correction), -ex 20 (low exposure), -sa 200 (very high saturation), -co 100 (high contrast)
 //Other settings don't seem to change anything (they're dependent on the camera model)
 IPCapture camera;
-String mjpegURL = "http://roborio-2438-frc.local:5800/?action=stream";
+String mjpegURL = "http://roborio-2438-frc.local:1181/?action=stream";
 
 // Camera parameters //
 int cameraWidth = 320;
@@ -93,6 +91,7 @@ OpenCV opencv;
 // Network tables //
 final String networkTableAddress = "roborio-2438-frc.local";//"10.24.38.227";
 NetworkTable networkTable;
+NetworkTableInstance inst = NetworkTableInstance.getDefault();
 final String networkTableName = "SmartDashboard";
 
 void setup() {
@@ -107,9 +106,9 @@ void setup() {
   frameRate(30);
   
   // Initialize network table //
-  NetworkTable.setClientMode();
-  NetworkTable.setIPAddress(networkTableAddress);
-  networkTable = NetworkTable.getTable(networkTableName);
+  networkTable = inst.getTable(networkTableName);
+  inst.startClientTeam(2438);
+  inst.startDSClient();
   
   // Initialize sound //
   minim = new Minim(this);
@@ -315,9 +314,9 @@ void draw() {
     // Push data to the network table //
     double closestXError = getTargetXError(closestTarget);
     double closestYError = getTargetYError(closestTarget);
-    networkTable.putNumber("vision-x-error", closestXError);
-    networkTable.putNumber("vision-y-error", closestYError);
-    networkTable.putNumber("vision-distance", estimatedDistance);
+    networkTable.getEntry("vision-x-error").setDouble(closestXError);
+    networkTable.getEntry("vision-y-error").setDouble(closestYError);
+    networkTable.getEntry("vision-distance").setDouble(estimatedDistance);
   }
   
   // Show targets and play sounds //
@@ -342,7 +341,7 @@ void draw() {
   rounder = 10;
   
   // Get network table data //
-  float elevationAngle = (float) networkTable.getNumber("gimbal-elevation-position", 0.0);
+  float elevationAngle = (float) networkTable.getEntry("gimbal-elevation-position").getDouble(0.0);
   float elevationAngleRounded = round(elevationAngle * rounder) / rounder;
   
   // Display non-target-based data //

@@ -8,8 +8,9 @@ import org.iolani.frc.commands.CommandBase;
 import org.iolani.frc.commands.SeekGimbalToVision;
 import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.command.PIDCommand;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -23,7 +24,7 @@ public class AutoVisionAzimuth extends PIDCommand {
     public AutoVisionAzimuth(double timeout) {
     	super("GimbalVisionPID", SeekGimbalToVision.K_P, SeekGimbalToVision.K_I, SeekGimbalToVision.K_D);
         requires(CommandBase.shooterGimbal);
-        _table = NetworkTable.getTable("SmartDashboard");
+        _table = NetworkTableInstance.getDefault().getTable("SmartDashboard");
         //SmartDashboard.putData("GimbalPID", this.getPIDController());
         this.getPIDController().setOutputRange(-SeekGimbalToVision.MAX_OUTPUT, SeekGimbalToVision.MAX_OUTPUT);
         this.setTimeout(timeout);
@@ -38,7 +39,7 @@ public class AutoVisionAzimuth extends PIDCommand {
     // use the vision error as the PID input //
 	@Override
 	protected double returnPIDInput() {
-		return _table.getNumber("vision-x-error", 0);
+		return _table.getEntry("vision-x-error").getDouble(0);
 	}
 
 	// control the azimuth power with PID output //

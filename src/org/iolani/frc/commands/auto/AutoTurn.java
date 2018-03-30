@@ -4,6 +4,7 @@ import org.iolani.frc.commands.CommandBase;
 
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
+import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -30,7 +31,7 @@ public class AutoTurn extends CommandBase implements PIDOutput {
     	requires(navsensor);
     	_degrees   = degrees;
     	_resetGyro = resetGyro;
-    	_pid = new PIDController(kP, kI, kD, navsensor, this);
+    	_pid = new PIDController(kP, kI, kD, LinearDigitalFilter.movingAverage(navsensor, 5), this);
     	_pid.setInputRange(-180.0f,  180.0f);
     	_pid.setContinuous(true);
     	/*_pid.setTolerance(new PIDController.Tolerance() {
@@ -40,7 +41,6 @@ public class AutoTurn extends CommandBase implements PIDOutput {
 			}	
 		});*/
     	_pid.setAbsoluteTolerance(2.0);
-    	_pid.setToleranceBuffer(5);
     	_pid.setOutputRange(-0.5, 0.5);
     	this.setTimeout(10);
     }
@@ -67,7 +67,6 @@ public class AutoTurn extends CommandBase implements PIDOutput {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	SmartDashboard.putNumber("drive-auto-avg-error", _pid.getAvgError());
     	SmartDashboard.putNumber("drive-auto-error", _pid.getError());
     	SmartDashboard.putBoolean("drive-auto-ontarget", _pid.onTarget());
     }

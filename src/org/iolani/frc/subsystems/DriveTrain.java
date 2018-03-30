@@ -5,15 +5,16 @@
  */
 package org.iolani.frc.subsystems;
 
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.iolani.frc.RobotMap;
 import org.iolani.frc.commands.OperateArcadeDrive;
 import org.iolani.frc.util.Utility;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
  *
@@ -22,12 +23,12 @@ import org.iolani.frc.util.Utility;
 
 public class DriveTrain extends Subsystem {
 	// hardware //
-    private CANTalon      _left;
-    private CANTalon      _leftSlave1;
-    private CANTalon      _leftSlave2;
-    private CANTalon      _right;
-    private CANTalon      _rightSlave1;
-    private CANTalon      _rightSlave2;
+    private TalonSRX      _left;
+    private TalonSRX      _leftSlave1;
+    private TalonSRX      _leftSlave2;
+    private TalonSRX      _right;
+    private TalonSRX      _rightSlave1;
+    private TalonSRX      _rightSlave2;
     
 	// physical constants //
 	private static final double WHEEL_DIAMETER_INCHES  = 8.0;
@@ -35,35 +36,29 @@ public class DriveTrain extends Subsystem {
 	private static final int    ENCODER_TICKS_PER_REV  = 128;
 	private static final int    ENCODER_PINION_TEETH   = 12;
 	private static final int    WHEEL_GEAR_TEETH       = 132;
-	private static final double ENCODER_INCHES_PER_REV = WHEEL_INCHES_PER_REV * ENCODER_PINION_TEETH / WHEEL_GEAR_TEETH;
+	private static final double ENCODER_INCHES_PER_TICK = (WHEEL_INCHES_PER_REV / ENCODER_TICKS_PER_REV) * ENCODER_PINION_TEETH / WHEEL_GEAR_TEETH;
 	
     public void init()  {
         // configure left //
-    	_left = new CANTalon(RobotMap.driveLeftMain);
+    	_left = new TalonSRX(RobotMap.driveLeftMain);
     	//_left.setInverted(true);
-    	_left.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-    	_left.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
-    	_left.reverseSensor(true);
-    	_left.setPosition(0.0);
-        _leftSlave1  = new CANTalon(RobotMap.driveLeftSlave1);
-        _leftSlave1.changeControlMode(TalonControlMode.Follower);
-        _leftSlave1.set(_left.getDeviceID());
-        _leftSlave2  = new CANTalon(RobotMap.driveLeftSlave2);
-        _leftSlave2.changeControlMode(TalonControlMode.Follower);
-        _leftSlave2.set(_left.getDeviceID());
+    	_left.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    	_left.setSensorPhase(true);
+    	_left.setSelectedSensorPosition(0, 0, 0);
+        _leftSlave1  = new TalonSRX(RobotMap.driveLeftSlave1);
+        _leftSlave1.follow(_left);
+        _leftSlave2  = new TalonSRX(RobotMap.driveLeftSlave2);
+        _leftSlave2.follow(_left);
         
         // configure right //
-        _right = new CANTalon(RobotMap.driveRightMain);
+        _right = new TalonSRX(RobotMap.driveRightMain);
         _right.setInverted(true);
-        _right.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-        _right.configEncoderCodesPerRev(ENCODER_TICKS_PER_REV);
-        _right.setPosition(0.0);
-        _rightSlave1 = new CANTalon(RobotMap.driveRightSlave1);
-        _rightSlave1.changeControlMode(TalonControlMode.Follower);
-        _rightSlave1.set(_right.getDeviceID());
-        _rightSlave2 = new CANTalon(RobotMap.driveRightSlave2);
-        _rightSlave2.changeControlMode(TalonControlMode.Follower);
-        _rightSlave2.set(_right.getDeviceID());
+        _right.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+        _right.setSelectedSensorPosition(0, 0, 0);
+        _rightSlave1 = new TalonSRX(RobotMap.driveRightSlave1);
+        _rightSlave1.follow(_right);
+        _rightSlave2 = new TalonSRX(RobotMap.driveRightSlave2);
+        _rightSlave2.follow(_right);
         
     }
 
@@ -109,8 +104,8 @@ public class DriveTrain extends Subsystem {
     	SmartDashboard.putNumber("drive-right-tank", right);
     	SmartDashboard.putNumber("drive-left-tank", left);
     	
-    	_left.set(left);
-    	_right.set(right);
+    	_left.set(ControlMode.PercentOutput, left);
+    	_right.set(ControlMode.PercentOutput, right);
     }
     
     /**
@@ -174,24 +169,24 @@ public class DriveTrain extends Subsystem {
     }
     
     public double getLeftEncoderDistance() {
-    	return _left.getPosition() * ENCODER_INCHES_PER_REV;
+    	return _left.getSelectedSensorPosition(0) * ENCODER_INCHES_PER_TICK;
     }
     
     public void setLeftEncoderDistance(double value) {
-    	_left.setPosition(value / ENCODER_INCHES_PER_REV);
+    	_left.setSelectedSensorPosition(Math.round((float) (value / ENCODER_INCHES_PER_TICK)), 0, 0);
     }
     
     public double getRightEncoderDistance() {
-    	return _right.getPosition() * ENCODER_INCHES_PER_REV;
+    	return _right.getSelectedSensorPosition(0) * ENCODER_INCHES_PER_TICK;
     }
     
     public void setRightEncoderDistance(double value) {
-    	_right.setPosition(value / ENCODER_INCHES_PER_REV);
+    	_right.setSelectedSensorPosition(Math.round((float) (value / ENCODER_INCHES_PER_TICK)), 0, 0);
     }
     
     public void debug() {
-    	SmartDashboard.putNumber("drive-left-power", _left.get());
-    	SmartDashboard.putNumber("drive-right-power", _right.get());
+    	SmartDashboard.putNumber("drive-left-power", _left.getMotorOutputPercent());
+    	SmartDashboard.putNumber("drive-right-power", _right.getMotorOutputPercent());
     	
     	SmartDashboard.putNumber("drive-left-distance", this.getLeftEncoderDistance());
     	SmartDashboard.putNumber("drive-right-distance", this.getRightEncoderDistance());

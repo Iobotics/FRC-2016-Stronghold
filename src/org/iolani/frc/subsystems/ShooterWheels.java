@@ -1,13 +1,15 @@
 package org.iolani.frc.subsystems;
 
 import org.iolani.frc.RobotMap;
-import org.iolani.frc.commands.*;
+import org.iolani.frc.commands.SetShooterWheelPower;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 
 /**
  *
@@ -15,51 +17,51 @@ import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 
 public class ShooterWheels extends Subsystem {
 
-	private CANTalon _left;
-	private CANTalon _right;
+	private TalonSRX _left;
+	private TalonSRX _right;
     
 	// note, due to mechanical issues, left is faster //
     public void init() {
-    	_left = new CANTalon(RobotMap.shooterWheelLeft);
-    	_left.enableBrakeMode(false);
-    	_left.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+    	_left = new TalonSRX(RobotMap.shooterWheelLeft);
+    	_left.setNeutralMode(NeutralMode.Coast);
+    	_left.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
     	
-    	_left.configNominalOutputVoltage(+0.0f, -0.0f);
-    	_left.configPeakOutputVoltage(+12.0f, -12.0f);
-    	_left.setProfile(1);
-    	_left.setF(0.023);
-    	_left.setP(0.05);
-    	_left.setI(0);
-    	_left.setD(5);
+    	_left.configNominalOutputForward(+0.0f, 0);
+    	_left.configNominalOutputForward(-0.0f, 0);
+    	_left.configPeakOutputForward(+12.0f, 0);
+    	_left.configPeakOutputReverse(-12.0f, 0);
+    	_left.selectProfileSlot(1, 0);
+    	_left.config_kF(1, 0.023, 0);
+    	_left.config_kP(1, 0.05, 0);
+    	_left.config_kI(1, 0, 0);
+    	_left.config_kD(1, 5, 0);
     	
-    	_right = new CANTalon(RobotMap.shooterWheelRight);
-    	_right.enableBrakeMode(false);
-    	_right.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
-    	_right.reverseSensor(true);
+    	_right = new TalonSRX(RobotMap.shooterWheelRight);
+    	_right.setNeutralMode(NeutralMode.Coast);
+    	_right.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
+    	_right.setSensorPhase(true);
     	
-    	_right.configNominalOutputVoltage(+0.0f, -0.0f);
-    	_right.configPeakOutputVoltage(+12.0f, -12.0f);
-    	_right.setProfile(1);
-    	_right.setF(0.024);
-    	_right.setP(0.05);
-    	_right.setI(0);
-    	_right.setD(5);
+    	_right.configNominalOutputForward(+0.0f, 0);
+    	_right.configNominalOutputForward(-0.0f, 0);
+    	_right.configPeakOutputForward(+12.0f, 0);
+    	_right.configPeakOutputReverse(-12.0f, 0);
+    	_right.selectProfileSlot(1, 0);
+    	_right.config_kF(1, 0.024, 0);
+    	_right.config_kP(1, 0.05, 0);
+    	_right.config_kI(1, 0, 0);
+    	_right.config_kD(1, 5, 0);
     }
     
     // positive is out //
     public void setPower(double power) {
-    	_left.changeControlMode(TalonControlMode.PercentVbus);    	
-    	_left.set(-power);
-    	_right.changeControlMode(TalonControlMode.PercentVbus);
-    	_right.set(-power);
+    	_left.set(ControlMode.PercentOutput, -power);
+    	_right.set(ControlMode.PercentOutput, -power);
     }
 
     // positive is out //
     public void setSpeed(double rpm) {
-    	_left.changeControlMode(TalonControlMode.Speed);
-    	_left.set(-rpm);
-    	_right.changeControlMode(TalonControlMode.Speed);
-    	_right.set(-rpm);
+    	_left.set(ControlMode.Velocity, -rpm);
+    	_right.set(ControlMode.Velocity, -rpm);
     }
     
     public void initDefaultCommand() {
@@ -67,8 +69,8 @@ public class ShooterWheels extends Subsystem {
     }
     
     public void debug() {
-     	SmartDashboard.putNumber("shooter-left-rpm", -(int) _left.getSpeed());
-    	SmartDashboard.putNumber("shooter-right-rpm", -(int) _right.getSpeed());
+     	SmartDashboard.putNumber("shooter-left-rpm", -(int) _left.getSelectedSensorVelocity(0));
+    	SmartDashboard.putNumber("shooter-right-rpm", -(int) _right.getSelectedSensorVelocity(0));
     }
 }
 

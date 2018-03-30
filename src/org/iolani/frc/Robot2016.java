@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.PrintCommand;
 //import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 //import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import org.iolani.frc.commands.*;
@@ -118,13 +117,6 @@ public class Robot2016 extends IterativeRobot {
         Scheduler.getInstance().run();
         
         this.debugStuff();
-    }
-    
-    /**
-     * This function is called periodically during test mode
-     */
-    public void testPeriodic() {
-        LiveWindow.run();
     }
     
     public void debugStuff() {

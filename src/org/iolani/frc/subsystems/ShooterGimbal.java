@@ -1,16 +1,18 @@
 package org.iolani.frc.subsystems;
 
 import org.iolani.frc.RobotMap;
-import org.iolani.frc.commands.*;
 //import org.iolani.frc.commands.debug.*;
+import org.iolani.frc.commands.HoldGimbalPosition;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
-import edu.wpi.first.wpilibj.DigitalOutput;
 
 /**
  *
@@ -18,8 +20,8 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 
 public class ShooterGimbal extends Subsystem {
 
-	private CANTalon _azimuth;
-	private CANTalon _elevation;
+	private TalonSRX _azimuth;
+	private TalonSRX _elevation;
 	
 	public AnalogPotentiometer _azimuthPot;
 	public AnalogPotentiometer _elevationPot;
@@ -45,14 +47,18 @@ public class ShooterGimbal extends Subsystem {
 	// physical constants //
 	private static final double POT_TURNS = 10;
 	
-	private static final double AZIMUTH_PINION_TEETH    = 12;
-	private static final double AZIMUTH_GEAR_TEETH      = 120;
-	private static final double AZIMUTH_DEGREES_PER_REV = (AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH) * 360;
-	private static final double AZIMUTH_POT_FULL_SCALE  = (POT_TURNS * 360) * AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH;
+	private static final int    ENCODER_TICKS_PER_REV = 4096;
+	
+	private static final double AZIMUTH_PINION_TEETH     = 12;
+	private static final double AZIMUTH_GEAR_TEETH       = 120;
+	private static final double AZIMUTH_DEGREES_PER_REV  = (AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH) * 360;
+	private static final double AZIMUTH_DEGREES_PER_TICK = AZIMUTH_DEGREES_PER_REV / ENCODER_TICKS_PER_REV;
+	private static final double AZIMUTH_POT_FULL_SCALE   = (POT_TURNS * 360) * AZIMUTH_PINION_TEETH / AZIMUTH_GEAR_TEETH;
 	
 	private static final double ELEVATION_PINION_TEETH    = 14;
 	private static final double ELEVATION_GEAR_TEETH      = 160;
 	private static final double ELEVATION_DEGREES_PER_REV = (ELEVATION_PINION_TEETH / ELEVATION_GEAR_TEETH) * 360;
+	private static final double ELEVATION_DEGREES_PER_TICK = ELEVATION_DEGREES_PER_REV / ENCODER_TICKS_PER_REV;
 	private static final double ELEVATION_POT_FULL_SCALE  = (POT_TURNS * 360) * ELEVATION_PINION_TEETH / ELEVATION_GEAR_TEETH;
 	
 	
@@ -61,46 +67,50 @@ public class ShooterGimbal extends Subsystem {
 	private static final double ELEVATION_OFFSET_DEGREES = -150.7;
 	
     public void init() {
-    	_azimuth = new CANTalon(RobotMap.shooterAzimuth);
-    	_azimuth.enableBrakeMode(true);
-    	_azimuth.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+    	_azimuth = new TalonSRX(RobotMap.shooterAzimuth);
+    	_azimuth.setNeutralMode(NeutralMode.Brake);
+    	_azimuth.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
     	
-    	_azimuth.setForwardSoftLimit(AZIMUTH_DEGREES_MAX / AZIMUTH_DEGREES_PER_REV);
-    	_azimuth.enableForwardSoftLimit(true);
-    	_azimuth.setReverseSoftLimit(AZIMUTH_DEGREES_MIN / AZIMUTH_DEGREES_PER_REV);
-    	_azimuth.enableReverseSoftLimit(true);
+    	_azimuth.configForwardSoftLimitThreshold(Math.round((float) (AZIMUTH_DEGREES_MAX / AZIMUTH_DEGREES_PER_REV)), 0);
+    	_azimuth.configForwardSoftLimitEnable(true, 0);
+    	_azimuth.configForwardSoftLimitThreshold(Math.round((float) (AZIMUTH_DEGREES_MIN / AZIMUTH_DEGREES_PER_REV)), 0);
+    	_azimuth.configForwardSoftLimitEnable(true, 0);
     	
-    	_azimuth.configNominalOutputVoltage(+0.0f, -0.0f);
-    	_azimuth.configPeakOutputVoltage(+12.0f, -12.0f);
+    	_azimuth.configNominalOutputForward(+0.0f, 0);
+    	_azimuth.configNominalOutputReverse(-0.0f, 0);
+    	_azimuth.configPeakOutputForward(+12.0f, 0);
+    	_azimuth.configPeakOutputReverse(-12.0f, 0);
     	
     	// position profile //
-    	_azimuth.setProfile(1);
-    	_azimuth.setF(0);
-    	_azimuth.setP(5);
-    	_azimuth.setI(0);
-    	_azimuth.setD(240);
+    	_azimuth.selectProfileSlot(1, 0);
+    	_azimuth.config_kF(1, 0, 0);
+    	_azimuth.config_kP(1, 5, 0);
+    	_azimuth.config_kI(1, 0, 0);
+    	_azimuth.config_kF(1, 240, 0);
     	
     	// azimuth pot //
     	_azimuthPot = new AnalogPotentiometer(RobotMap.shooterAzimuthADC, AZIMUTH_POT_FULL_SCALE, AZIMUTH_OFFSET_DEGREES);
     	
     	// note: elevation is inverted //
-    	_elevation = new CANTalon(RobotMap.shooterElevation);
-    	_elevation.enableBrakeMode(true);
-    	_elevation.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
+    	_elevation = new TalonSRX(RobotMap.shooterElevation);
+    	_elevation.setNeutralMode(NeutralMode.Brake);
+    	_elevation.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
     	
     	this.setElevationEnvelope(ElevationEnvelope.Full);
-    	_elevation.enableForwardSoftLimit(true);
-    	_elevation.enableReverseSoftLimit(true);
+    	_elevation.configForwardSoftLimitEnable(true, 0);
+    	_elevation.configReverseSoftLimitEnable(true, 0);
     	
-    	_elevation.configNominalOutputVoltage(+0.0f, -0.0f);
-    	_elevation.configPeakOutputVoltage(+12.0f, -12.0f);
+    	_elevation.configNominalOutputForward(+0.0f, 0);
+    	_elevation.configNominalOutputReverse(-0.0f, 0);
+    	_elevation.configPeakOutputForward(+12.0f, 0);
+    	_elevation.configPeakOutputReverse(-12.0f, 0);
     	
     	// position profile //
-    	_elevation.setProfile(1);
-    	_elevation.setF(0);
-    	_elevation.setP(12);
-    	_elevation.setI(0);
-    	_elevation.setD(240);
+    	_elevation.selectProfileSlot(1, 0);
+    	_elevation.config_kF(1, 0, 0);
+    	_elevation.config_kP(1, 12, 0);
+    	_elevation.config_kI(1, 0, 0);
+    	_elevation.config_kF(1, 240, 0);
     	
     	// elevation pot //
     	_elevationPot = new AnalogPotentiometer(RobotMap.shooterElevationADC, ELEVATION_POT_FULL_SCALE, ELEVATION_OFFSET_DEGREES);
@@ -116,12 +126,12 @@ public class ShooterGimbal extends Subsystem {
     }
     
     public void resetEncoders() {
-    	_azimuth.setPosition(0);
-    	_elevation.setPosition(0);
+    	_azimuth.setSelectedSensorPosition(0, 0, 0);
+    	_elevation.setSelectedSensorPosition(0, 0, 0);
     }
     
     public double getAzimuthDegrees() {
-    	return _azimuth.getPosition() * AZIMUTH_DEGREES_PER_REV;
+    	return _azimuth.getSelectedSensorPosition(0) * AZIMUTH_DEGREES_PER_TICK;
     }
  
     public double getAzimuthPotDegrees() {
@@ -133,9 +143,8 @@ public class ShooterGimbal extends Subsystem {
     }
     
     public void setAzimuthSetpointDegrees(double degrees) {
-    	_azimuth.setProfile(1);
-    	_azimuth.changeControlMode(TalonControlMode.Position);
-    	_azimuth.set(degrees / AZIMUTH_DEGREES_PER_REV);
+    	_azimuth.selectProfileSlot(1, 0);
+    	_azimuth.set(ControlMode.Position, degrees / AZIMUTH_DEGREES_PER_TICK);
     	_azimuthSetpoint = degrees;
     }
  
@@ -144,11 +153,11 @@ public class ShooterGimbal extends Subsystem {
     }
     
     public double getElevationDegrees() {
-    	return -_elevation.getPosition() * ELEVATION_DEGREES_PER_REV;
+    	return -_elevation.getSelectedSensorPosition(0) * ELEVATION_DEGREES_PER_TICK;
     }
     
     public void setElevationPosition(double degrees) {
-    	_elevation.setPosition(-degrees / ELEVATION_DEGREES_PER_REV);	
+    	_elevation.setSelectedSensorPosition(Math.round((float) (-degrees / ELEVATION_DEGREES_PER_TICK)), 0, 0);	
     }
     
     public double getElevationPotDegrees() {
@@ -160,9 +169,8 @@ public class ShooterGimbal extends Subsystem {
     }
     
     public void setElevationSetpointDegrees(double degrees) {
-    	_elevation.setProfile(1);
-    	_elevation.changeControlMode(TalonControlMode.Position);
-    	_elevation.set(-degrees / ELEVATION_DEGREES_PER_REV);
+    	_elevation.selectProfileSlot(1, 0);
+    	_elevation.set(ControlMode.Position, -degrees / ELEVATION_DEGREES_PER_REV);
     	_elevationSetpoint = -degrees;
     }
 
@@ -173,12 +181,12 @@ public class ShooterGimbal extends Subsystem {
     public void setElevationEnvelope(ElevationEnvelope env) {
     	switch(env) {
     		case Full:
-    	    	_elevation.setForwardSoftLimit(-ELEVATION_DEGREES_MIN / ELEVATION_DEGREES_PER_REV);
-    	    	_elevation.setReverseSoftLimit(-ELEVATION_DEGREES_MAX / ELEVATION_DEGREES_PER_REV);
+    	    	_elevation.configForwardSoftLimitThreshold(Math.round((float) (-ELEVATION_DEGREES_MIN / ELEVATION_DEGREES_PER_REV)), 0);
+    	    	_elevation.configReverseSoftLimitThreshold(Math.round((float) (-ELEVATION_DEGREES_MAX / ELEVATION_DEGREES_PER_REV)), 0);
     	    	break;
     		case Shot:
-    			_elevation.setForwardSoftLimit(-ELEVATION_SHOT_DEGREES_MIN / ELEVATION_DEGREES_PER_REV);
-    	    	_elevation.setReverseSoftLimit(-ELEVATION_SHOT_DEGREES_MAX / ELEVATION_DEGREES_PER_REV);
+    			_elevation.configForwardSoftLimitThreshold(Math.round((float) (-ELEVATION_SHOT_DEGREES_MIN / ELEVATION_DEGREES_PER_REV)), 0);
+    	    	_elevation.configReverseSoftLimitThreshold(Math.round((float) (-ELEVATION_SHOT_DEGREES_MAX / ELEVATION_DEGREES_PER_REV)), 0);
     			break;
     	}
     }
@@ -186,15 +194,13 @@ public class ShooterGimbal extends Subsystem {
     // positive is clockwise //
     public void setAzimuthPower(double power) {
     	_azimuthSetpoint = 0;
-    	_azimuth.changeControlMode(TalonControlMode.PercentVbus);
-    	_azimuth.set(power);
+    	_azimuth.set(ControlMode.PercentOutput, power);
     }
     
     // positive is up //
     public void setElevationPower(double power) {
     	_elevationSetpoint = 0;
-    	_elevation.changeControlMode(TalonControlMode.PercentVbus);  
-    	_elevation.set(-power);
+    	_elevation.set(ControlMode.PercentOutput, -power);
     }
     
     public void setDebugOutput(boolean value) {

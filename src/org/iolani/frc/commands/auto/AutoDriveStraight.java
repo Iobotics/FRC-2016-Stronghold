@@ -43,12 +43,7 @@ public class AutoDriveStraight extends CommandBase implements PIDOutput, PIDSour
     	}
     	_pid = new PIDController(kP, kI, kD, this, this);
 		//_pid.setAbsoluteTolerance(1.0); // 2 inch tolerance //
-    	_pid.setTolerance(new PIDController.Tolerance() {
-				@Override
-				public boolean onTarget() {
-					return  Math.abs(_pid.getError()) < 0.5;
-				}	
-    		});
+    	_pid.setAbsoluteTolerance(0.5);
 		//_pid.setToleranceBuffer(2);
     	_pid.setOutputRange(-power, power);
     }
