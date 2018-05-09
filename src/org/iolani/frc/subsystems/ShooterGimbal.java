@@ -71,10 +71,10 @@ public class ShooterGimbal extends Subsystem {
     	_azimuth.setNeutralMode(NeutralMode.Brake);
     	_azimuth.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0);
     	
-    	_azimuth.configForwardSoftLimitThreshold(Math.round((float) (AZIMUTH_DEGREES_MAX / AZIMUTH_DEGREES_PER_REV)), 0);
+    	_azimuth.configForwardSoftLimitThreshold(Math.round((float) (AZIMUTH_DEGREES_MAX / AZIMUTH_DEGREES_PER_TICK)), 0);
     	_azimuth.configForwardSoftLimitEnable(true, 0);
-    	_azimuth.configForwardSoftLimitThreshold(Math.round((float) (AZIMUTH_DEGREES_MIN / AZIMUTH_DEGREES_PER_REV)), 0);
-    	_azimuth.configForwardSoftLimitEnable(true, 0);
+    	_azimuth.configReverseSoftLimitThreshold(Math.round((float) (AZIMUTH_DEGREES_MIN / AZIMUTH_DEGREES_PER_TICK)), 0);
+    	_azimuth.configReverseSoftLimitEnable(true, 0);
     	
     	_azimuth.configNominalOutputForward(+0.0f, 0);
     	_azimuth.configNominalOutputReverse(-0.0f, 0);
@@ -86,7 +86,7 @@ public class ShooterGimbal extends Subsystem {
     	_azimuth.config_kF(1, 0, 0);
     	_azimuth.config_kP(1, 5, 0);
     	_azimuth.config_kI(1, 0, 0);
-    	_azimuth.config_kF(1, 240, 0);
+    	_azimuth.config_kD(1, 240, 0);
     	
     	// azimuth pot //
     	_azimuthPot = new AnalogPotentiometer(RobotMap.shooterAzimuthADC, AZIMUTH_POT_FULL_SCALE, AZIMUTH_OFFSET_DEGREES);
@@ -110,7 +110,7 @@ public class ShooterGimbal extends Subsystem {
     	_elevation.config_kF(1, 0, 0);
     	_elevation.config_kP(1, 12, 0);
     	_elevation.config_kI(1, 0, 0);
-    	_elevation.config_kF(1, 240, 0);
+    	_elevation.config_kD(1, 240, 0);
     	
     	// elevation pot //
     	_elevationPot = new AnalogPotentiometer(RobotMap.shooterElevationADC, ELEVATION_POT_FULL_SCALE, ELEVATION_OFFSET_DEGREES);
@@ -131,7 +131,7 @@ public class ShooterGimbal extends Subsystem {
     }
     
     public double getAzimuthDegrees() {
-    	return _azimuth.getSelectedSensorPosition(0) * AZIMUTH_DEGREES_PER_TICK;
+    	return (_azimuth.getSelectedSensorPosition(0) * AZIMUTH_DEGREES_PER_TICK);
     }
  
     public double getAzimuthPotDegrees() {
@@ -153,7 +153,7 @@ public class ShooterGimbal extends Subsystem {
     }
     
     public double getElevationDegrees() {
-    	return -_elevation.getSelectedSensorPosition(0) * ELEVATION_DEGREES_PER_TICK;
+    	return -(_elevation.getSelectedSensorPosition(0) * ELEVATION_DEGREES_PER_TICK);
     }
     
     public void setElevationPosition(double degrees) {
@@ -170,7 +170,7 @@ public class ShooterGimbal extends Subsystem {
     
     public void setElevationSetpointDegrees(double degrees) {
     	_elevation.selectProfileSlot(1, 0);
-    	_elevation.set(ControlMode.Position, -degrees / ELEVATION_DEGREES_PER_REV);
+    	_elevation.set(ControlMode.Position, -(degrees / ELEVATION_DEGREES_PER_TICK));
     	_elevationSetpoint = -degrees;
     }
 
@@ -181,12 +181,12 @@ public class ShooterGimbal extends Subsystem {
     public void setElevationEnvelope(ElevationEnvelope env) {
     	switch(env) {
     		case Full:
-    	    	_elevation.configForwardSoftLimitThreshold(Math.round((float) (-ELEVATION_DEGREES_MIN / ELEVATION_DEGREES_PER_REV)), 0);
-    	    	_elevation.configReverseSoftLimitThreshold(Math.round((float) (-ELEVATION_DEGREES_MAX / ELEVATION_DEGREES_PER_REV)), 0);
+    	    	_elevation.configForwardSoftLimitThreshold(Math.round((float) (-ELEVATION_DEGREES_MIN / ELEVATION_DEGREES_PER_TICK)), 0);
+    	    	_elevation.configReverseSoftLimitThreshold(Math.round((float) (-ELEVATION_DEGREES_MAX / ELEVATION_DEGREES_PER_TICK)), 0);
     	    	break;
     		case Shot:
-    			_elevation.configForwardSoftLimitThreshold(Math.round((float) (-ELEVATION_SHOT_DEGREES_MIN / ELEVATION_DEGREES_PER_REV)), 0);
-    	    	_elevation.configReverseSoftLimitThreshold(Math.round((float) (-ELEVATION_SHOT_DEGREES_MAX / ELEVATION_DEGREES_PER_REV)), 0);
+    			_elevation.configForwardSoftLimitThreshold(Math.round((float) (-ELEVATION_SHOT_DEGREES_MIN / ELEVATION_DEGREES_PER_TICK)), 0);
+    	    	_elevation.configReverseSoftLimitThreshold(Math.round((float) (-ELEVATION_SHOT_DEGREES_MAX / ELEVATION_DEGREES_PER_TICK)), 0);
     			break;
     	}
     }

@@ -7,6 +7,8 @@ package org.iolani.frc.commands;
 import org.iolani.frc.subsystems.ShooterGimbal;
 import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+
 /**
  *
  * @author iobotics
@@ -35,8 +37,8 @@ public class OperateGimbalSlow extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	double azimuth   = oi.getGunnerStick().getX() * 2;
-        double elevation = oi.getGunnerStick().getY();
+    	double azimuth   = oi.getGunnerStick().getX(Hand.kLeft) * 2;
+        double elevation = oi.getGunnerStick().getY(Hand.kLeft);
         
         double deltaTime = (this.timeSinceInitialized() - _lastTime);
         double deltaStep = SPEED_DEG_PER_SEC * deltaTime;

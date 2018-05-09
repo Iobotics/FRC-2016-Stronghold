@@ -61,11 +61,11 @@ public class Intake extends Subsystem {
     }
     
     public double getIntakePositionDegrees() {
-    	return _intake.getSelectedSensorPosition(0) / ENCODER_TICKS_PER_REV;
+    	return _intake.getSelectedSensorPosition(0) / (ENCODER_TICKS_PER_REV / 360.0);
     }
     
     public void setIntakePositionDegrees(double angle) {
-    	_intake.set(ControlMode.Position, angle);
+    	_intake.set(ControlMode.Position, ((angle / 360.0) * ENCODER_TICKS_PER_REV));
     }
     
     public void initDefaultCommand() {

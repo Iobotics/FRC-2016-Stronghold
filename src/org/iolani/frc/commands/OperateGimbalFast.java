@@ -7,6 +7,8 @@ package org.iolani.frc.commands;
 import org.iolani.frc.commands.CommandBase;
 import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+
 /**
  *
  * @author iobotics
@@ -60,7 +62,7 @@ public class OperateGimbalFast extends CommandBase {
         	_lastPOV = pov;
         } else {
         	// azimuth control //
-            double azimuth = oi.getGunnerStick().getX();
+            double azimuth = oi.getGunnerStick().getX(Hand.kLeft);
             if(Math.abs(azimuth) > DEADBAND) {
             	azimuth *= 0.3;
             	shooterGimbal.setAzimuthPower(azimuth);
@@ -72,7 +74,7 @@ public class OperateGimbalFast extends CommandBase {
             }
             
             // elevation control //
-            double elevation = oi.getGunnerStick().getY();
+            double elevation = oi.getGunnerStick().getY(Hand.kLeft);
             if(Math.abs(elevation) > DEADBAND) {
             	elevation *= 0.3;
             	shooterGimbal.setElevationPower(elevation);

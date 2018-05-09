@@ -7,6 +7,7 @@ package org.iolani.frc.commands.debug;
 import org.iolani.frc.commands.CommandBase;
 import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 
 /**
  *
@@ -26,7 +27,7 @@ public class TuneGimbalPID extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Joystick gstick = oi.getGunnerStick();
+    	XboxController gstick = oi.getGunnerStick();
         if(gstick.getRawButton(1)) {
         	// down //
         	shooterGimbal.setDebugOutput(true);

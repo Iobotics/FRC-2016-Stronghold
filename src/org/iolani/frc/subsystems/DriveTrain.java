@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.iolani.frc.RobotMap;
 import org.iolani.frc.commands.OperateArcadeDrive;
+import org.iolani.frc.commands.OperateTankDrive;
 import org.iolani.frc.util.Utility;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -41,20 +42,21 @@ public class DriveTrain extends Subsystem {
     public void init()  {
         // configure left //
     	_left = new TalonSRX(RobotMap.driveLeftMain);
-    	//_left.setInverted(true);
-    	_left.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    	_left.setSensorPhase(true);
-    	_left.setSelectedSensorPosition(0, 0, 0);
+    	_left.setInverted(true);
+    	//_left.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    	//_left.setSensorPhase(true);
+    	//_left.setSelectedSensorPosition(0, 0, 0);
         _leftSlave1  = new TalonSRX(RobotMap.driveLeftSlave1);
         _leftSlave1.follow(_left);
+        _leftSlave1.setInverted(true);
         _leftSlave2  = new TalonSRX(RobotMap.driveLeftSlave2);
         _leftSlave2.follow(_left);
+        _leftSlave2.setInverted(true);
         
         // configure right //
         _right = new TalonSRX(RobotMap.driveRightMain);
-        _right.setInverted(true);
-        _right.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-        _right.setSelectedSensorPosition(0, 0, 0);
+        //_right.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+        //_right.setSelectedSensorPosition(0, 0, 0);
         _rightSlave1 = new TalonSRX(RobotMap.driveRightSlave1);
         _rightSlave1.follow(_right);
         _rightSlave2 = new TalonSRX(RobotMap.driveRightSlave2);
@@ -64,8 +66,8 @@ public class DriveTrain extends Subsystem {
 
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
-        //this.setDefaultCommand(new OperateTankDrive());
-        this.setDefaultCommand(new OperateArcadeDrive());
+        this.setDefaultCommand(new OperateTankDrive());
+        //this.setDefaultCommand(new OperateArcadeDrive());
     }
 
     /**
@@ -188,7 +190,7 @@ public class DriveTrain extends Subsystem {
     	SmartDashboard.putNumber("drive-left-power", _left.getMotorOutputPercent());
     	SmartDashboard.putNumber("drive-right-power", _right.getMotorOutputPercent());
     	
-    	SmartDashboard.putNumber("drive-left-distance", this.getLeftEncoderDistance());
-    	SmartDashboard.putNumber("drive-right-distance", this.getRightEncoderDistance());
+    	//SmartDashboard.putNumber("drive-left-distance", this.getLeftEncoderDistance());
+    	//SmartDashboard.putNumber("drive-right-distance", this.getRightEncoderDistance());
     }    
 }

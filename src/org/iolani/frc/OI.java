@@ -1,17 +1,33 @@
 
 package org.iolani.frc;
 
+//import org.iolani.frc.util.PowerScaler;
+import org.iolani.frc.commands.IntakeBall;
+import org.iolani.frc.commands.LoadBall;
+import org.iolani.frc.commands.OperateGimbalFast;
+import org.iolani.frc.commands.OperateGimbalSlow;
+import org.iolani.frc.commands.OperateGunnerDrive;
+import org.iolani.frc.commands.OutakeBall;
+import org.iolani.frc.commands.SeekGimbalToPosition;
+import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
+import org.iolani.frc.commands.SeekGimbalToVision;
+import org.iolani.frc.commands.SetShooterKicker;
+import org.iolani.frc.commands.SetShooterWheelPower;
+import org.iolani.frc.commands.SetShooterWheelSpeed;
+import org.iolani.frc.commands.auto.AutoDriveDeadReckon;
+import org.iolani.frc.commands.auto.AutoDriveStraight;
+import org.iolani.frc.commands.auto.AutoDriveTimed;
+import org.iolani.frc.commands.auto.AutoLowBarAndShoot;
+import org.iolani.frc.commands.auto.AutoTurn;
+import org.iolani.frc.commands.auto.AutoVisionAzimuth;
+import org.iolani.frc.util.ConditionalButton;
+import org.iolani.frc.util.JoystickAxisThresholdButton;
+
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-
-import org.iolani.frc.util.ConditionalButton;
-import org.iolani.frc.util.JoystickAxisThresholdButton;
-//import org.iolani.frc.util.PowerScaler;
-import org.iolani.frc.commands.*;
-import org.iolani.frc.commands.SeekGimbalToPosition.GimbalPosition;
-import org.iolani.frc.commands.auto.*;
 //import org.iolani.frc.commands.debug.*;
 
 /**
@@ -28,7 +44,7 @@ public class OI {
 	// joysticks //
     private final Joystick _lStick = new Joystick(1);
     private final Joystick _rStick = new Joystick(2);
-    private final Joystick _xStick = new Joystick(3);
+    private final XboxController _xStick = new XboxController(3);
     
     // driver buttons //
     private final Button _intakeButton = new JoystickButton(_rStick, 1);
@@ -48,14 +64,14 @@ public class OI {
     // gunner buttons //
     private final Button _gunnerFastButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 3));
     private final Button _gunnerSlowButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 4));
-    private final Button _gunnerSpinButton = new ConditionalButton(_gunnerModeState, 
-    			new JoystickAxisThresholdButton(_xStick, XSTICK_LTRIGGER_AXIS, 0.25, 1)
-    		);
-    private final Button _gunnerFireButton = new ConditionalButton(_gunnerModeState, 
+    private final Button _gunnerSpinButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 6));
+    private final Button _gunnerFireButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 5));
+    private final Button _gunnerHomeButton   = new ConditionalButton(_gunnerModeState, 
 			new JoystickAxisThresholdButton(_xStick, XSTICK_RTRIGGER_AXIS, 0.25, 1)
+    	);
+    private final Button _gunnerSuckButton   = new ConditionalButton(_gunnerModeState, 
+			new JoystickAxisThresholdButton(_xStick, XSTICK_LTRIGGER_AXIS, 0.25, 1)
 		);
-    private final Button _gunnerHomeButton   = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 5));
-    private final Button _gunnerSuckButton   = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 6));
     private final Button _gunnerDriveButton  = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 1));
     private final Button _gunnerVisionButton = new ConditionalButton(_gunnerModeState, new JoystickButton(_xStick, 2));
     
@@ -126,7 +142,7 @@ public class OI {
     	_gunnerModeState.setPressed(enabled);
     }
     
-    public Joystick getGunnerStick() {
+    public XboxController getGunnerStick() {
     	return _xStick;
     }
 }

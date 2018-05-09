@@ -10,6 +10,7 @@ import org.iolani.frc.subsystems.ShooterGimbal.ElevationEnvelope;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.command.PIDCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -69,7 +70,7 @@ public class SeekGimbalToVision extends PIDCommand {
 
 	@Override
 	protected void execute() {
-		double elevation = CommandBase.oi.getGunnerStick().getY();
+		double elevation = CommandBase.oi.getGunnerStick().getY(Hand.kLeft);
         
         double deltaTime = (this.timeSinceInitialized() - _lastTime);
         double deltaStep = SPEED_DEG_PER_SEC * deltaTime;

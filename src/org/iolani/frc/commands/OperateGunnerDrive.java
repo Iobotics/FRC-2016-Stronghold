@@ -4,6 +4,7 @@
  */
 package org.iolani.frc.commands;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 /**
  *
@@ -21,8 +22,8 @@ public class OperateGunnerDrive extends CommandBase {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-        double mag = -oi.getGunnerStick().getY() / 2;
-        double rot = -oi.getGunnerStick().getX() / 1.5;
+        double mag = oi.getGunnerStick().getY(Hand.kLeft) / 2;
+        double rot = oi.getGunnerStick().getX(Hand.kLeft) / 1.5;
         
         // signal conditioning //
         //System.out.println("joysticks: " + mag + ", " + rot);

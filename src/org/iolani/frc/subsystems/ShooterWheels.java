@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 
 public class ShooterWheels extends Subsystem {
+	
+	private static final int ENCODER_TICKS_PER_REV = 4096;
 
 	private TalonSRX _left;
 	private TalonSRX _right;
@@ -60,8 +62,8 @@ public class ShooterWheels extends Subsystem {
 
     // positive is out //
     public void setSpeed(double rpm) {
-    	_left.set(ControlMode.Velocity, -rpm);
-    	_right.set(ControlMode.Velocity, -rpm);
+    	_left.set(ControlMode.Velocity, -(rpm * ENCODER_TICKS_PER_REV));
+    	_right.set(ControlMode.Velocity, -(rpm * ENCODER_TICKS_PER_REV));
     }
     
     public void initDefaultCommand() {
@@ -69,8 +71,8 @@ public class ShooterWheels extends Subsystem {
     }
     
     public void debug() {
-     	SmartDashboard.putNumber("shooter-left-rpm", -(int) _left.getSelectedSensorVelocity(0));
-    	SmartDashboard.putNumber("shooter-right-rpm", -(int) _right.getSelectedSensorVelocity(0));
+     	SmartDashboard.putNumber("shooter-left-rpm", -((int) _left.getSelectedSensorVelocity(0) / ENCODER_TICKS_PER_REV));
+    	SmartDashboard.putNumber("shooter-right-rpm", -((int) _right.getSelectedSensorVelocity(0) / ENCODER_TICKS_PER_REV));
     }
 }
 
